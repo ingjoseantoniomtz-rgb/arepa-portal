@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Director · A-RE-PA · SMART Projects</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --dark:#2D2D2D;--pink:#FF3EA5;--purple:#9B5FD4;--cyan:#00C8D7;
+  --bg:#F0F2F7;--surface:#fff;--border:#E4E7EF;
+  --text:#1A1D2E;--muted:#6B7280;--light:#F8F9FC;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--blue:#3B82F6;
+  --sidebar-w:248px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+[x-cloak]{display:none!important}
+
+/* ── PIN ─── */
+.pin-screen{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a1d2e 0%,#0d0b1a 60%,#1a1125 100%);
+  padding:2rem;gap:1.5rem;
+}
+.pin-logo .brand{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.5px}
+.pin-logo .brand span{color:var(--pink)}
+.pin-logo .sub{font-size:.8rem;color:rgba(255,255,255,.4);margin-top:.3rem;letter-spacing:2px;text-transform:uppercase;text-align:center}
+.pin-card{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:1.25rem;padding:2.5rem 2rem;width:100%;max-width:360px;text-align:center;
+}
+.pin-card h2{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.pin-card p{font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:1.5rem;line-height:1.5}
+.pin-input{
+  width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.08);
+  border:1.5px solid rgba(255,255,255,.15);border-radius:.75rem;
+  color:#fff;font-size:1.4rem;letter-spacing:.5rem;text-align:center;
+  font-family:'Inter',sans-serif;font-weight:700;outline:none;
+  -webkit-text-security:disc;transition:border-color .2s;
+}
+.pin-input:focus{border-color:var(--pink)}
+.pin-btn{width:100%;margin-top:1rem;padding:.7rem;background:var(--pink);color:#fff;border:none;border-radius:.75rem;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .2s}
+.pin-btn:hover{background:#e02e8d}
+.pin-error{font-size:.78rem;color:#fca5a5;margin-top:.5rem;min-height:1.2rem}
+
+/* ── LAYOUT ─── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--dark);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.07)}
+.sidebar-logo{font-size:1.1rem;font-weight:800;color:#fff}
+.sidebar-logo span{color:var(--pink)}
+.sidebar-project{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.2rem;text-transform:uppercase;letter-spacing:1.5px}
+.sidebar-role{display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;padding:.2rem .65rem;border-radius:999px;font-size:.7rem;font-weight:600;background:rgba(255,62,165,.15);color:var(--pink)}
+.sidebar-nav{flex:1;overflow-y:auto;padding:1rem 0}
+.nav-section{padding:.4rem 1.25rem .2rem;font-size:.63rem;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:1.5px;margin-top:.5rem}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 1.25rem;font-size:.83rem;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav-item.active{color:#fff;background:rgba(255,62,165,.1);border-left-color:var(--pink)}
+.nav-icon{width:18px;text-align:center;flex-shrink:0}
+.nb{margin-left:auto;background:var(--cyan);color:#fff;font-size:.63rem;font-weight:700;padding:.1rem .4rem;border-radius:999px}
+.sidebar-footer{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.07)}
+.sidebar-footer strong{display:block;font-size:.78rem;color:rgba(255,255,255,.7);margin-bottom:.2rem}
+.sidebar-footer span{font-size:.72rem;color:rgba(255,255,255,.35)}
+.logout-btn{margin-top:.6rem;font-size:.72rem;color:rgba(255,255,255,.3);background:none;border:1px solid rgba(255,255,255,.1);padding:.3rem .8rem;border-radius:6px;cursor:pointer;transition:all .2s}
+.logout-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.85rem 1.75rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:1.05rem;font-weight:700;flex:1}
+.topbar-actions{display:flex;align-items:center;gap:.75rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:.5rem;font-size:.8rem;font-weight:600;border:none;transition:all .2s;cursor:pointer}
+.btn-primary{background:var(--pink);color:#fff}
+.btn-primary:hover{background:#e02e8d}
+.btn-cyan{background:var(--cyan);color:#fff}
+.btn-cyan:hover{background:#00b0be}
+.btn-outline{background:#fff;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--pink);color:var(--pink)}
+.btn-ghost{background:none;color:var(--muted);border:none}
+.btn-sm{padding:.3rem .65rem;font-size:.75rem}
+.btn-danger{background:#fee2e2;color:var(--red);border:1px solid #fecaca}
+.btn-danger:hover{background:var(--red);color:#fff}
+.menu-toggle{display:none!important}
+.content{padding:1.75rem;flex:1}
+
+/* ── CARDS ─── */
+.card{background:#fff;border-radius:1rem;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.card-header{padding:1.1rem 1.4rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.card-title{font-size:.9rem;font-weight:700}
+.card-body{padding:1.4rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.kpi-card{background:#fff;border-radius:1rem;padding:1.25rem 1.4rem;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-card.pink::before{background:var(--pink)}.kpi-card.cyan::before{background:var(--cyan)}.kpi-card.purple::before{background:var(--purple)}.kpi-card.dark::before{background:var(--dark)}.kpi-card.green::before{background:var(--green)}.kpi-card.amber::before{background:var(--amber)}.kpi-card.red::before{background:var(--red)}
+.kpi-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.5rem}
+.kpi-value{font-size:1.9rem;font-weight:800;color:var(--text);line-height:1}
+.kpi-sub{font-size:.73rem;color:var(--muted);margin-top:.35rem}
+.progress-bar{height:8px;background:#f0f2f7;border-radius:999px;overflow:hidden;margin:.4rem 0}
+.progress-fill{height:100%;border-radius:999px;transition:width .5s}
+.fill-pink{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.fill-cyan{background:linear-gradient(90deg,var(--cyan),#00b0be)}
+.fill-green{background:var(--green)}
+
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.dash-grid .span2{grid-column:span 2}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:999px;font-size:.72rem;font-weight:600}
+.badge-green{background:#d1fae5;color:#065f46}.badge-amber{background:#fef3c7;color:#92400e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-purple{background:#ede9fe;color:#5b21b6}.badge-pink{background:#fce7f3;color:#9d174d}.badge-gray{background:#f3f4f6;color:#4b5563}.badge-cyan{background:#cffafe;color:#164e63}
+
+/* ── TABLE ─── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead tr{background:var(--light);border-bottom:2px solid var(--border)}
+th{padding:.65rem 1rem;text-align:left;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--light)}
+.amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* ── GANTT ─── */
+.gantt-pro-wrap{overflow-x:auto}
+.gantt-pro-table{border-collapse:collapse;width:100%;min-width:780px;font-size:.78rem}
+.gantt-pro-table th{background:var(--light);font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:.5rem .6rem;white-space:nowrap;border-bottom:2px solid var(--border)}
+.gantt-pro-table td{padding:.3rem .6rem;border-bottom:1px solid #f0f2f7;vertical-align:middle;white-space:nowrap}
+.gantt-pro-table tr:hover>td{background:rgba(0,0,0,.015)}
+.gantt-critical-row>td{background:rgba(239,68,68,.025)!important}
+.gpt-id{width:26px;text-align:center;color:var(--muted);font-size:.7rem}
+.gpt-name{min-width:150px;max-width:180px;white-space:normal;line-height:1.35}
+.gpt-dt{width:64px;font-size:.7rem;color:var(--muted)}
+.gpt-status{width:90px}
+.gpt-pred{width:42px;text-align:center;color:var(--muted);font-size:.7rem}
+.gpt-resch{width:96px}
+.gpt-chart-th,.gpt-chart-td{padding:0!important;position:relative;min-width:380px}
+.gpt-chart-td{height:32px}
+.gpt-chart-th,.gpt-chart-td{
+  background-image:linear-gradient(to right,#f4f6fa 0,#f4f6fa calc(50% - .5px),#e4e7ef calc(50% - .5px),#e4e7ef 50%,#fff 50%,#fff calc(100% - .5px),#e4e7ef calc(100% - .5px),#e4e7ef 100%);
+  background-size:21.875% 100%;background-repeat:repeat-x;
+}
+.gantt-wk-hdr{display:flex;height:30px;position:relative}
+.gantt-wk-lbl{flex:0 0 10.9375%;font-size:.6rem;font-weight:700;color:var(--muted);padding-left:.3rem;display:flex;align-items:center;border-left:1px solid var(--border)}
+.gantt-wk-lbl:first-child{border-left:none}
+.gantt-wk-lbl:last-child{flex:1}
+.gantt-bar-pro{position:absolute;height:16px;top:50%;transform:translateY(-50%);border-radius:3px;display:flex;align-items:center;padding:0 .35rem;overflow:hidden;white-space:nowrap;min-width:3px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.gantt-bar-pro.rc{background:var(--red)!important;box-shadow:0 1px 4px rgba(239,68,68,.4)}
+.gantt-bar-orig{position:absolute;height:5px;top:calc(50% + 8px);transform:translateY(-50%);border-radius:2px;opacity:.3;min-width:3px}
+.gantt-bar-lbl{font-size:.58rem;color:rgba(255,255,255,.92);font-weight:700}
+.today-v{position:absolute;top:0;bottom:0;width:2px;background:rgba(239,68,68,.8);z-index:20;pointer-events:none}
+.today-hdr-lbl{position:absolute;top:4px;font-size:.55rem;font-weight:800;color:#fff;background:var(--red);padding:1px 5px;border-radius:3px;white-space:nowrap;transform:translateX(-50%)}
+
+.inner-tabs{display:flex;gap:.25rem;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
+.inner-tab{padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.inner-tab.active{color:var(--pink);border-bottom-color:var(--pink)}
+
+/* ── FEED ─── */
+.feed-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:#fff}
+.feed-body{flex:1}
+.feed-meta{font-size:.75rem;color:var(--muted);margin-bottom:.3rem}
+.feed-meta strong{color:var(--text);font-weight:600}
+.feed-text{font-size:.85rem;line-height:1.55}
+.feed-tag{font-size:.68rem;padding:.12rem .4rem;border-radius:4px;background:var(--light);color:var(--muted);margin-left:.35rem}
+
+/* ── MIRO ─── */
+.miro-frame{width:100%;height:580px;border-radius:0 0 1rem 1rem;border:none}
+.miro-placeholder{width:100%;height:420px;border-radius:.75rem;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--light);gap:1rem}
+
+/* ── DOCS ─── */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem}
+.doc-card{border:1.5px solid var(--border);border-radius:.85rem;padding:1.1rem;cursor:pointer;transition:all .2s;background:#fff}
+.doc-card:hover{border-color:var(--pink);box-shadow:0 4px 15px rgba(255,62,165,.12)}
+.doc-icon{font-size:2rem;margin-bottom:.5rem}
+.doc-name{font-size:.82rem;font-weight:600;margin-bottom:.25rem;line-height:1.3}
+.doc-meta{font-size:.7rem;color:var(--muted)}
+.doc-type{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.63rem;font-weight:700;text-transform:uppercase;margin-bottom:.45rem}
+.dt-legal{background:#ede9fe;color:#5b21b6}.dt-tech{background:#dbeafe;color:#1e40af}.dt-permit{background:#fef3c7;color:#92400e}.dt-invoice{background:#d1fae5;color:#065f46}
+
+/* ── STATUS BAR ─── */
+.status-bar{background:linear-gradient(135deg,var(--dark) 0%,#1a1125 100%);padding:1.25rem 1.75rem;border-radius:1rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;color:#fff;gap:1rem;flex-wrap:wrap}
+.status-bar h2{font-size:1.2rem;font-weight:800}
+.status-bar p{font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.2rem}
+.status-chips{display:flex;gap:.6rem;flex-wrap:wrap}
+.status-chip{padding:.3rem .8rem;border-radius:999px;font-size:.73rem;font-weight:600;border:1px solid rgba(255,255,255,.15)}
+.sc-pink{background:rgba(255,62,165,.2);color:#f9a8d4;border-color:rgba(255,62,165,.3)}
+.sc-cyan{background:rgba(0,200,215,.2);color:#67e8f9;border-color:rgba(0,200,215,.3)}
+.sc-purple{background:rgba(155,95,212,.2);color:#d8b4fe;border-color:rgba(155,95,212,.3)}
+
+/* ── MODAL ─── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:#fff;border-radius:1.25rem;width:100%;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;max-height:90vh;overflow-y:auto}
+.modal-lg{max-width:700px}
+.modal-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-size:1rem;font-weight:700}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.75rem;position:sticky;bottom:0;background:#fff}
+.form-group{margin-bottom:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+label{font-size:.8rem;font-weight:600;display:block;margin-bottom:.35rem}
+input,select,textarea{width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:.5rem;font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);transition:border-color .15s;outline:none;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,62,165,.1)}
+textarea{resize:vertical;min-height:80px}
+input[type=date]{color:var(--text)}
+
+/* ── TIMELINE ─── */
+.timeline{position:relative;padding-left:1.5rem}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;padding-bottom:1.25rem}
+.tl-dot{position:absolute;left:-1.5rem;top:2px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--border)}
+.tl-dot.done{background:var(--green);box-shadow:0 0 0 2px #d1fae5}
+.tl-dot.active{background:var(--pink);box-shadow:0 0 0 2px #fce7f3;animation:pulse 2s infinite}
+.tl-dot.pending{background:#e5e7eb}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 2px rgba(255,62,165,.2)}50%{box-shadow:0 0 0 6px rgba(255,62,165,.1)}}
+.tl-date{font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:.15rem}
+.tl-title{font-size:.85rem;font-weight:600}
+.tl-sub{font-size:.77rem;color:var(--muted);margin-top:.1rem}
+
+/* ── EVM GAUGE ─── */
+.evm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.evm-cell{background:var(--light);border-radius:.75rem;padding:.9rem 1rem;text-align:center}
+.evm-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:.25rem}
+.evm-val{font-size:1.3rem;font-weight:800}
+
+/* ── PRINT ─── */
+@media print{
+  .sidebar,.topbar-actions,.no-print{display:none!important}
+  .main{margin-left:0!important}
+  .content{padding:.5in}
+  .card{break-inside:avoid;box-shadow:none}
+  body{background:#fff}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.kpi-grid{grid-template-columns:1fr 1fr}
+  .dash-grid{grid-template-columns:1fr}.dash-grid .span2{grid-column:span 1}
+  .menu-toggle{display:flex!important;align-items:center}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body x-data="app()" x-init="init()">
+
+<!-- PIN SCREEN -->
+<div class="pin-screen" x-show="!unlocked" x-transition>
+  <div class="pin-logo">
+    <div class="brand">SMART <span>Projects</span></div>
+    <div class="sub">Portal Director de Proyecto</div>
+  </div>
+  <div class="pin-card">
+    <div style="font-size:2.5rem;margin-bottom:.75rem">👷‍♂️</div>
+    <h2>Acceso — Director de Obra</h2>
+    <p>NIP de acceso exclusivo para el director del proyecto</p>
+    <input class="pin-input" type="password" x-model="pinInput" maxlength="6" placeholder="••••••"
+           @keydown.enter="checkPin()" autocomplete="off" inputmode="numeric">
+    <div class="pin-error" x-text="pinError"></div>
+    <button class="pin-btn" @click="checkPin()">Acceder →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" x-show="unlocked" x-cloak>
+
+  <div x-show="sidebarOpen" @click="sidebarOpen=false"
+       :style="sidebarOpen?'display:block':'display:none'"
+       style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;display:none"></div>
+
+  <nav class="sidebar" :class="{open:sidebarOpen}">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">SMART <span>Projects</span></div>
+      <div class="sidebar-project">A-RE-PA 2026</div>
+      <div class="sidebar-role">👷‍♂️ Director de Proyecto</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Resumen</div>
+      <div class="nav-item" :class="{active:tab==='dashboard'}" @click="tab='dashboard';sidebarOpen=false"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section">Áreas PMI</div>
+      <div class="nav-item" :class="{active:tab==='scope'}" @click="tab='scope';sidebarOpen=false"><span class="nav-icon">📋</span> Alcance</div>
+      <div class="nav-item" :class="{active:tab==='schedule'}" @click="tab='schedule';sidebarOpen=false"><span class="nav-icon">📅</span> Cronograma</div>
+      <div class="nav-item" :class="{active:tab==='cost'}" @click="tab='cost';sidebarOpen=false"><span class="nav-icon">💰</span> Costos & EVM</div>
+      <div class="nav-item" :class="{active:tab==='risk'}" @click="tab='risk';sidebarOpen=false"><span class="nav-icon">⚠️</span> Riesgos</div>
+      <div class="nav-item" :class="{active:tab==='quality'}" @click="tab='quality';sidebarOpen=false"><span class="nav-icon">✅</span> Calidad</div>
+      <div class="nav-item" :class="{active:tab==='comms'}" @click="tab='comms';sidebarOpen=false">
+        <span class="nav-icon">💬</span> Comunicaciones
+        <span class="nb" x-text="comms.filter(c=>!c.read).length" x-show="comms.filter(c=>!c.read).length>0"></span>
+      </div>
+      <div class="nav-section">Herramientas</div>
+      <div class="nav-item" :class="{active:tab==='involucrados'}" @click="tab='involucrados';sidebarOpen=false"><span class="nav-icon">👥</span> Involucrados</div>
+      <div class="nav-item" :class="{active:tab==='creative'}" @click="tab='creative';sidebarOpen=false"><span class="nav-icon">🎨</span> Taller Creativo</div>
+      <div class="nav-item" :class="{active:tab==='docs'}" @click="tab='docs';sidebarOpen=false"><span class="nav-icon">📁</span> Documentos</div>
+      <div class="nav-item" :class="{active:tab==='reports'}" @click="tab='reports';sidebarOpen=false"><span class="nav-icon">📄</span> Reportes</div>
+      <div class="nav-section">Admin</div>
+      <div class="nav-item" :class="{active:tab==='config'}" @click="tab='config';sidebarOpen=false"><span class="nav-icon">⚙️</span> Configuración</div>
+    </div>
+    <div class="sidebar-footer">
+      <strong>J.A. Martínez de la Rosa</strong>
+      <span>amartinez@luxsystems.mx</span>
+      <button class="logout-btn" @click="logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="btn btn-ghost menu-toggle" style="padding:.35rem" @click="sidebarOpen=!sidebarOpen">☰</button>
+      <h1 x-text="tabTitle()"></h1>
+      <div class="topbar-actions">
+        <span class="badge badge-green">🟢 En Ejecución</span>
+        <button class="btn btn-outline btn-sm no-print" @click="window.print()">📄 PDF</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div x-show="tab==='dashboard'">
+        <div class="status-bar">
+          <div>
+            <h2>Panel Director — Proyecto A-RE-PA</h2>
+            <p>Vista completa · Edición habilitada · Semana 1 de 9</p>
+          </div>
+          <div class="status-chips">
+            <span class="status-chip sc-pink">🔧 Acceso Total</span>
+            <span class="status-chip sc-cyan">EVM Activo</span>
+            <span class="status-chip sc-purple">8 Estakeholders</span>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card pink"><div class="kpi-label">Avance General</div><div class="kpi-value" x-text="kpi.avance+'%'"></div><div class="kpi-sub">Meta semana 1: 8%</div><div class="progress-bar"><div class="progress-fill fill-pink" :style="'width:'+kpi.avance+'%'"></div></div></div>
+          <div class="kpi-card cyan"><div class="kpi-label">Pagado a la fecha</div><div class="kpi-value" x-text="'$'+fmtN(kpi.pagado)"></div><div class="kpi-sub" x-text="'de $293,525 · '+Math.round(kpi.pagado/293525*100)+'%'"></div></div>
+          <div class="kpi-card purple"><div class="kpi-label">Días transcurridos</div><div class="kpi-value" x-text="daysSinceStart()"></div><div class="kpi-sub">de 64 días totales</div></div>
+          <div class="kpi-card green"><div class="kpi-label">SPI</div><div class="kpi-value" x-text="kpi.spi"></div><div class="kpi-sub" x-text="kpi.spi>=1?'Adelantado o puntual':'Atraso en cronograma'"></div></div>
+          <div class="kpi-card amber"><div class="kpi-label">CPI</div><div class="kpi-value" x-text="kpi.cpi"></div><div class="kpi-sub" x-text="kpi.cpi>=1?'En presupuesto':'Sobrecosto'"></div></div>
+          <div class="kpi-card dark"><div class="kpi-label">Riesgos Activos</div><div class="kpi-value" x-text="risks.filter(r=>r.status==='activo').length"></div><div class="kpi-sub" x-text="risks.filter(r=>r.nivel==='alto'&&r.status==='activo').length+' de nivel alto'"></div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Actualizar KPIs del Proyecto</div></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group"><label>Avance General (%)</label><input type="number" x-model="kpi.avance" min="0" max="100" @change="saveKpi()"></div>
+                <div class="form-group"><label>Monto Pagado ($)</label><input type="number" x-model="kpi.pagado" @change="saveKpi()"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>SPI</label><input type="number" x-model="kpi.spi" step=".01" @change="saveKpi()"></div>
+                <div class="form-group"><label>CPI</label><input type="number" x-model="kpi.cpi" step=".01" @change="saveKpi()"></div>
+              </div>
+              <div class="form-group"><label>Nota de avance para cliente</label><textarea x-model="kpi.nota" rows="2" placeholder="Ej: Se concluyó el levantamiento arq. e inicia el proyecto ejecutivo." @change="saveKpi()"></textarea></div>
+              <button class="btn btn-primary btn-sm" @click="saveKpi();alert('KPIs actualizados ✓')">Guardar KPIs</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Hitos del Proyecto</div><button class="btn btn-cyan btn-sm" @click="showMilestoneModal=true">+ Agregar</button></div>
+            <div class="card-body">
+              <div class="timeline">
+                <template x-for="m in milestones" :key="m.id">
+                  <div class="tl-item">
+                    <div class="tl-dot" :class="m.status"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                      <div>
+                        <div class="tl-date" x-text="m.date"></div>
+                        <div class="tl-title" x-text="m.title"></div>
+                        <div class="tl-sub" x-text="m.sub"></div>
+                      </div>
+                      <button class="btn btn-ghost btn-sm" @click="toggleMilestone(m)" x-text="m.status==='done'?'↩':'✓'" title="Marcar completo"></button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CRONOGRAMA ═══ -->
+      <div x-show="tab==='schedule'">
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="card-header">
+            <div class="card-title">Gantt — Proyecto A-RE-PA (editable)</div>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+              <span style="font-size:.72rem;color:var(--muted)">Ruta crítica en 🔴 · Reprogramado en ↪</span>
+              <button class="btn btn-ghost btn-sm" @click="resetGantt()">↩ Reset</button>
+              <button class="btn btn-cyan btn-sm" @click="saveGantt();showSaved()">💾 Guardar</button>
+            </div>
+          </div>
+          <div style="padding:.65rem 1.4rem;background:var(--light);border-bottom:1px solid var(--border);font-size:.78rem;color:var(--muted)">
+            <strong style="color:var(--text)">Cómo reprogramar:</strong> Haz clic en la fecha de "Inicio reprogramado" de cualquier tarea y elige la nueva fecha. El Gantt se actualiza en tiempo real. Guarda para persistir.
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="gantt-pro-wrap">
+              <table class="gantt-pro-table">
+                <thead>
+                  <tr>
+                    <th class="gpt-id">#</th>
+                    <th class="gpt-name">Tarea</th>
+                    <th class="gpt-dt">Inicio</th>
+                    <th class="gpt-dt">Fin</th>
+                    <th class="gpt-pred">Pred</th>
+                    <th class="gpt-status">Estado</th>
+                    <th class="gpt-resch">↪ Reprog.</th>
+                    <th class="gpt-chart-th">
+                      <div class="gantt-wk-hdr">
+                        <div class="gantt-wk-lbl">18 Jun</div>
+                        <div class="gantt-wk-lbl">25 Jun</div>
+                        <div class="gantt-wk-lbl">02 Jul</div>
+                        <div class="gantt-wk-lbl">09 Jul</div>
+                        <div class="gantt-wk-lbl">16 Jul</div>
+                        <div class="gantt-wk-lbl">23 Jul</div>
+                        <div class="gantt-wk-lbl">30 Jul</div>
+                        <div class="gantt-wk-lbl">06 Ago</div>
+                        <div class="gantt-wk-lbl">13 Ago</div>
+                        <div class="gantt-wk-lbl">20 Ago</div>
+                        <div class="today-v" :style="'left:'+todayPct+'%'" x-show="todayPct>0&&todayPct<100">
+                          <div class="today-hdr-lbl">HOY</div>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="t in ganttTasks" :key="t.id">
+                    <tr :class="t.critical?'gantt-critical-row':''">
+                      <td class="gpt-id" x-text="t.id"></td>
+                      <td class="gpt-name">
+                        <span x-show="t.critical" style="color:var(--red);font-size:.65rem;margin-right:.2rem">●</span>
+                        <span x-text="t.name" :style="t.critical?'font-weight:600;font-size:.78rem':'font-size:.78rem'"></span>
+                      </td>
+                      <td class="gpt-dt" x-text="t.s0"></td>
+                      <td class="gpt-dt" x-text="t.e0"></td>
+                      <td class="gpt-pred" x-text="t.pred"></td>
+                      <td class="gpt-status">
+                        <select x-model="t.status" style="font-size:.7rem;padding:.2rem .3rem;width:100%" @change="saveGantt()">
+                          <option>Pendiente</option>
+                          <option>En proceso</option>
+                          <option>Completado</option>
+                          <option>Suspendido</option>
+                        </select>
+                      </td>
+                      <td class="gpt-resch">
+                        <div style="display:flex;align-items:center;gap:.3rem">
+                          <input type="date" x-model="t.rescheduled" style="font-size:.7rem;padding:.2rem .3rem;width:100px" @change="saveGantt()" :min="'2026-06-18'" :max="'2026-08-30'">
+                          <button x-show="t.rescheduled" @click="t.rescheduled=null;saveGantt()" class="btn btn-ghost" style="padding:.1rem .25rem;font-size:.65rem;color:var(--muted)">✕</button>
+                        </div>
+                      </td>
+                      <td class="gpt-chart-td">
+                        <!-- reprogrammed bar -->
+                        <div class="gantt-bar-pro" :class="t.critical?'rc':''" :style="gBarStyle(t)+(t.critical?'':';background:'+t.color)">
+                          <span class="gantt-bar-lbl" x-text="t.rescheduled?'↪ '+fmtDay(t.rescheduled):(t.dur>=6?t.s0:'')"></span>
+                        </div>
+                        <!-- original bar hint (only when rescheduled) -->
+                        <div class="gantt-bar-orig" x-show="t.rescheduled" :style="gOrigStyle(t)+';background:'+t.color"></div>
+                        <div class="today-v" :style="'left:'+todayPct+'%'" x-show="todayPct>0&&todayPct<100"></div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 1rem;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border)">
+              <span>◀ 18 Jun 2026</span><span>64 días · Ruta crítica: 2→6→7→8→10→11→13→15</span><span>21 Ago 2026 ▶</span>
+            </div>
+          </div>
+        </div>
+        <div x-show="ganttSaved" x-transition style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:.75rem;padding:.75rem 1.1rem;font-size:.83rem;color:#065f46;font-weight:600;margin-bottom:.75rem">
+          ✓ Cambios guardados. Visibles para la cliente en su portal.
+        </div>
+      </div>
+
+      <!-- ═══ ALCANCE ═══ -->
+      <div x-show="tab==='scope'">
+        <div class="dash-grid">
+          <div class="card span2">
+            <div class="card-header"><div class="card-title">Control de Cambios de Alcance (CR)</div><button class="btn btn-primary btn-sm" @click="showChangeModal=true">+ Nuevo CR</button></div>
+            <div class="card-body">
+              <div x-show="changes.length===0" style="text-align:center;padding:2rem;color:var(--muted)">Sin solicitudes de cambio registradas.</div>
+              <div class="table-wrap" x-show="changes.length>0">
+                <table>
+                  <thead><tr><th>#CR</th><th>Fecha</th><th>Descripción</th><th>Costo</th><th>Tiempo</th><th>Estado</th><th class="no-print">Acciones</th></tr></thead>
+                  <tbody>
+                    <template x-for="ch in changes" :key="ch.id">
+                      <tr>
+                        <td x-text="'CR-'+String(ch.id).padStart(3,'0')"></td>
+                        <td x-text="ch.date"></td><td x-text="ch.desc"></td>
+                        <td class="amount" x-text="ch.costImpact"></td><td x-text="ch.timeImpact"></td>
+                        <td>
+                          <select x-model="ch.status" @change="saveChanges()" style="font-size:.72rem;padding:.2rem .35rem">
+                            <option>Solicitado</option><option>En revisión</option><option>Aprobado</option><option>Rechazado</option>
+                          </select>
+                        </td>
+                        <td class="no-print"><button class="btn btn-danger btn-sm" @click="removeChange(ch.id)">🗑</button></td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card span2">
+            <div class="card-header"><div class="card-title">EDT — Estructura de Desglose de Trabajo</div></div>
+            <div class="card-body" style="font-size:.83rem;line-height:1.75">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem">
+                <template x-for="wbs in wbsItems" :key="wbs.code">
+                  <div style="padding:.8rem;background:var(--light);border-radius:.65rem;border-left:3px solid" :style="'border-color:'+wbs.color">
+                    <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:.2rem" x-text="wbs.code"></div>
+                    <div style="font-weight:600;font-size:.83rem" x-text="wbs.name"></div>
+                    <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" x-text="wbs.desc"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ COSTOS & EVM ═══ -->
+      <div x-show="tab==='cost'">
+        <div class="kpi-grid">
+          <div class="kpi-card dark"><div class="kpi-label">BAC (Presupuesto)</div><div class="kpi-value">$293,525</div></div>
+          <div class="kpi-card green"><div class="kpi-label">PV (Valor Planificado)</div><div class="kpi-value" x-text="'$'+fmtN(evm.pv)"></div></div>
+          <div class="kpi-card pink"><div class="kpi-label">EV (Valor Ganado)</div><div class="kpi-value" x-text="'$'+fmtN(evm.ev)"></div></div>
+          <div class="kpi-card amber"><div class="kpi-label">AC (Costo Real)</div><div class="kpi-value" x-text="'$'+fmtN(evm.ac)"></div></div>
+          <div class="kpi-card cyan"><div class="kpi-label">SPI</div><div class="kpi-value" x-text="evm.pv>0?(evm.ev/evm.pv).toFixed(2):'—'"></div></div>
+          <div class="kpi-card purple"><div class="kpi-label">CPI</div><div class="kpi-value" x-text="evm.ac>0?(evm.ev/evm.ac).toFixed(2):'—'"></div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Actualizar Curva S / EVM</div></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group"><label>PV — Valor Planificado ($)</label><input type="number" x-model="evm.pv" @change="saveEvm()"></div>
+                <div class="form-group"><label>EV — Valor Ganado ($)</label><input type="number" x-model="evm.ev" @change="saveEvm()"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>AC — Costo Real ($)</label><input type="number" x-model="evm.ac" @change="saveEvm()"></div>
+                <div class="form-group"><label>EAC estimado ($)</label><input type="number" x-model="evm.eac" @change="saveEvm()"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" @click="saveEvm();alert('EVM actualizado ✓')">Guardar EVM</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Tabla de Amortizaciones</div></div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>#</th><th>Concepto</th><th>Fecha</th><th class="amount">Monto</th><th>Estado</th></tr></thead>
+                  <tbody>
+                    <template x-for="p in payments" :key="p.id">
+                      <tr>
+                        <td x-text="p.no"></td><td x-text="p.tipo"></td><td><input type="text" x-model="p.fecha" style="font-size:.75rem;padding:.2rem .35rem;width:90px" @change="savePayments()"></td>
+                        <td class="amount" x-text="'$'+fmtN(p.monto)"></td>
+                        <td>
+                          <select x-model="p.status" @change="savePayments()" style="font-size:.7rem;padding:.2rem .35rem">
+                            <option value="pagado">✓ Pagado</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="vencido">Vencido</option>
+                          </select>
+                        </td>
+                      </tr>
+                    </template>
+                    <tr style="font-weight:700;background:var(--light)"><td colspan="3" style="text-align:right">TOTAL</td><td class="amount">$293,524.81</td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ RIESGOS ═══ -->
+      <div x-show="tab==='risk'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registro de Riesgos</div>
+            <div style="display:flex;gap:.5rem">
+              <span class="badge badge-red" x-text="risks.filter(r=>r.nivel==='alto'&&r.status==='activo').length+' alto'"></span>
+              <button class="btn btn-primary btn-sm" @click="showRiskModal=true;editRisk=null">+ Agregar Riesgo</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Descripción</th><th>Prob</th><th>Impacto</th><th>Nivel</th><th>Plan de Respuesta</th><th>Estado</th><th class="no-print">Acciones</th></tr></thead>
+                <tbody>
+                  <template x-for="r in risks" :key="r.id">
+                    <tr>
+                      <td x-text="'R-'+String(r.id).padStart(3,'0')"></td>
+                      <td x-text="r.desc" style="max-width:200px;white-space:normal;font-size:.78rem"></td>
+                      <td><select x-model="r.prob" @change="saveRisks()" style="font-size:.7rem;padding:.15rem .25rem"><option>alta</option><option>media</option><option>baja</option></select></td>
+                      <td><select x-model="r.impacto" @change="saveRisks()" style="font-size:.7rem;padding:.15rem .25rem"><option>alto</option><option>medio</option><option>bajo</option></select></td>
+                      <td><span class="badge" :class="r.nivel==='alto'?'badge-red':r.nivel==='medio'?'badge-amber':'badge-green'" x-text="r.nivel"></span></td>
+                      <td style="font-size:.74rem;max-width:220px;white-space:normal" x-text="r.plan"></td>
+                      <td><select x-model="r.status" @change="saveRisks()" style="font-size:.7rem;padding:.15rem .25rem"><option>activo</option><option>mitigado</option><option>cerrado</option></select></td>
+                      <td class="no-print" style="white-space:nowrap">
+                        <button class="btn btn-outline btn-sm" @click="openEditRisk(r)">✏️</button>
+                        <button class="btn btn-danger btn-sm" @click="removeRisk(r.id)">🗑</button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CALIDAD ═══ -->
+      <div x-show="tab==='quality'">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Lista de Verificación de Calidad</div><button class="btn btn-primary btn-sm" @click="showQaModal=true">+ Agregar ítem</button></div>
+          <div class="card-body">
+            <template x-for="qa in qualityPhases" :key="qa.phase">
+              <div style="margin-bottom:1.25rem">
+                <div style="font-weight:700;font-size:.88rem;margin-bottom:.6rem" x-text="qa.phase"></div>
+                <template x-for="item in qa.items" :key="item.id">
+                  <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+                    <input type="checkbox" x-model="item.done" @change="saveQuality()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--pink)">
+                    <div style="flex:1">
+                      <div style="font-size:.83rem" x-text="item.desc" :style="item.done?'text-decoration:line-through;color:var(--muted)':''"></div>
+                      <div style="font-size:.7rem;color:var(--muted)" x-text="item.norm"></div>
+                    </div>
+                    <span class="badge" :class="item.done?'badge-green':'badge-gray'" x-text="item.done?'✓ OK':'Pendiente'"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ COMUNICACIONES ═══ -->
+      <div x-show="tab==='comms'">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Bitácora del Proyecto</div><button class="btn btn-primary btn-sm" @click="showCommModal=true">+ Nueva entrada</button></div>
+          <div class="card-body">
+            <div class="inner-tabs">
+              <button class="inner-tab" :class="{active:commTab==='all'}" @click="commTab='all'">Todos</button>
+              <button class="inner-tab" :class="{active:commTab==='update'}" @click="commTab='update'">Avances</button>
+              <button class="inner-tab" :class="{active:commTab==='decision'}" @click="commTab='decision'">Decisiones</button>
+              <button class="inner-tab" :class="{active:commTab==='issue'}" @click="commTab='issue'">Incidencias</button>
+            </div>
+            <template x-for="c in comms.filter(c=>commTab==='all'||c.type===commTab)" :key="c.id">
+              <div class="feed-item">
+                <div class="feed-avatar" :style="'background:'+(c.from==='JAM'?'var(--pink)':'var(--cyan)')">
+                  <span x-text="c.from==='JAM'?'JA':'GG'"></span>
+                </div>
+                <div class="feed-body">
+                  <div class="feed-meta">
+                    <strong x-text="c.from==='JAM'?'J.A. Martínez (Director)':'Graciela G. (Cliente)'"></strong>
+                    <span x-text="' · '+c.date"></span>
+                    <span class="feed-tag" x-text="c.type==='update'?'📊 Avance':c.type==='decision'?'🔑 Decisión':'⚠️ Incidencia'"></span>
+                  </div>
+                  <div class="feed-text" x-text="c.text"></div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ INVOLUCRADOS ═══ -->
+      <div x-show="tab==='involucrados'">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Registro de Involucrados</div><button class="btn btn-primary btn-sm" @click="showStakeholderModal=true">+ Agregar</button></div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Nombre</th><th>Rol</th><th>Empresa / Especialidad</th><th>Contacto</th><th>Influencia</th><th>Interés</th><th class="no-print">Acciones</th></tr></thead>
+                <tbody>
+                  <template x-for="s in stakeholders" :key="s.id">
+                    <tr>
+                      <td x-text="s.id"></td>
+                      <td><strong x-text="s.name"></strong></td>
+                      <td><span class="badge badge-purple" x-text="s.role"></span></td>
+                      <td x-text="s.company"></td>
+                      <td x-text="s.contact"></td>
+                      <td><span class="badge" :class="s.influencia==='Alta'?'badge-red':s.influencia==='Media'?'badge-amber':'badge-blue'" x-text="s.influencia"></span></td>
+                      <td><span class="badge" :class="s.interes==='Alto'?'badge-green':s.interes==='Medio'?'badge-amber':'badge-gray'" x-text="s.interes"></span></td>
+                      <td class="no-print"><button class="btn btn-danger btn-sm" @click="removeStakeholder(s.id)">🗑</button></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TALLER CREATIVO ═══ -->
+      <div x-show="tab==='creative'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎨 Taller Creativo — Pizarrón Miro</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-cyan btn-sm" @click="showMiroModal=true">⚙️ Configurar URL</button>
+              <button class="btn btn-ghost btn-sm" @click="miroUrl&&window.open(miroUrl,'_blank')">↗ Abrir</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+            <template x-if="miroUrl">
+              <iframe class="miro-frame" :src="miroUrl" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+            </template>
+            <template x-if="!miroUrl">
+              <div class="miro-placeholder" style="border-radius:0 0 1rem 1rem">
+                <div style="font-size:3rem">🎨</div>
+                <div style="font-weight:700;font-size:1rem">Tablero Miro no configurado</div>
+                <div style="font-size:.83rem;color:var(--muted);text-align:center;max-width:350px">Haz clic en "Configurar URL" e ingresa el embed link de tu tablero Miro.</div>
+                <button class="btn btn-primary" @click="showMiroModal=true">⚙️ Configurar ahora</button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DOCUMENTOS ═══ -->
+      <div x-show="tab==='docs'">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div class="inner-tabs" style="margin-bottom:0;border-bottom:none">
+            <button class="inner-tab" :class="{active:docTab==='all'}" @click="docTab='all'">Todos</button>
+            <button class="inner-tab" :class="{active:docTab==='legal'}" @click="docTab='legal'">Legal</button>
+            <button class="inner-tab" :class="{active:docTab==='tech'}" @click="docTab='tech'">Técnico</button>
+            <button class="inner-tab" :class="{active:docTab==='permit'}" @click="docTab='permit'">Permisos</button>
+            <button class="inner-tab" :class="{active:docTab==='invoice'}" @click="docTab='invoice'">Pagos</button>
+          </div>
+          <button class="btn btn-primary btn-sm no-print" @click="showDocModal=true">+ Agregar doc</button>
+        </div>
+        <div class="doc-grid">
+          <template x-for="doc in filteredDocs()" :key="doc.id">
+            <div class="doc-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="doc-icon" x-text="doc.icon"></div>
+                <button class="btn btn-danger btn-sm no-print" @click="removeDoc(doc.id)" style="padding:.15rem .4rem">✕</button>
+              </div>
+              <div class="doc-type" :class="'dt-'+doc.type" x-text="doc.typeLabel"></div>
+              <div class="doc-name" x-text="doc.name"></div>
+              <div class="doc-meta" x-text="doc.date+' · '+doc.size"></div>
+              <div style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem">
+                <select x-model="doc.status" @change="saveDocs()" style="font-size:.67rem;padding:.15rem .25rem;flex:1">
+                  <option>firmado</option><option>vigente</option><option>en trámite</option><option>pendiente</option>
+                </select>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- ═══ REPORTES ═══ -->
+      <div x-show="tab==='reports'">
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Generar Reporte</div></div>
+            <div class="card-body">
+              <div class="form-group"><label>Tipo de Reporte</label><select x-model="reportType"><option value="weekly">Informe Semanal al Cliente</option><option value="general">Informe General Ejecutivo</option><option value="evm">Reporte EVM / Curva S</option></select></div>
+              <div class="form-group"><label>Período</label><input type="text" x-model="reportPeriod" placeholder="Semana 1 · 18–21 Jun 2026"></div>
+              <div class="form-group"><label>Avance narrativo</label><textarea x-model="reportNarrative" rows="3" placeholder="Resumen de actividades del período..."></textarea></div>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <button class="btn btn-primary" @click="window.print()">📄 Exportar PDF</button>
+              </div>
+            </div>
+          </div>
+          <div class="card" id="report-preview">
+            <div class="card-header"><div class="card-title">Vista Previa</div></div>
+            <div class="card-body" style="font-size:.82rem;line-height:1.7">
+              <div style="display:flex;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:3px solid var(--pink)">
+                <div><div style="font-size:1.1rem;font-weight:800;color:var(--dark)">SMART Projects</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Proyecto A-RE-PA</div></div>
+                <div style="text-align:right"><div style="font-size:.85rem;font-weight:700" x-text="reportType==='weekly'?'INFORME SEMANAL':reportType==='evm'?'REPORTE EVM':'INFORME GENERAL'"></div><div style="font-size:.73rem;color:var(--muted)" x-text="reportPeriod"></div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem">
+                <div style="background:var(--dark);color:#fff;border-radius:.5rem;padding:.7rem;text-align:center"><div style="font-size:1.2rem;font-weight:800" x-text="kpi.avance+'%'"></div><div style="font-size:.68rem;opacity:.7">Avance</div></div>
+                <div style="background:var(--pink);color:#fff;border-radius:.5rem;padding:.7rem;text-align:center"><div style="font-size:1.2rem;font-weight:800" x-text="'$'+Math.round(kpi.pagado/1000)+'K'"></div><div style="font-size:.68rem;opacity:.7">Pagado</div></div>
+                <div style="background:var(--purple);color:#fff;border-radius:.5rem;padding:.7rem;text-align:center"><div style="font-size:1.2rem;font-weight:800" x-text="kpi.spi"></div><div style="font-size:.68rem;opacity:.7">SPI</div></div>
+              </div>
+              <div style="font-weight:700;margin-bottom:.3rem">Avance narrativo:</div>
+              <div style="color:var(--muted)" x-text="reportNarrative||'(sin texto narrativo)'"></div>
+              <div style="margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)">
+                <span>J.A. Martínez de la Rosa · SMART Projects</span>
+                <span x-text="new Date().toLocaleDateString('es-MX')"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CONFIGURACIÓN ═══ -->
+      <div x-show="tab==='config'">
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">⚙️ Configuración del Portal</div></div>
+            <div class="card-body">
+              <div class="form-group"><label>Nombre del Proyecto</label><input type="text" x-model="config.projectName" @change="saveConfig()"></div>
+              <div class="form-group"><label>Cliente</label><input type="text" x-model="config.client" @change="saveConfig()"></div>
+              <div class="form-group"><label>Fecha de inicio</label><input type="date" x-model="config.startDate" @change="saveConfig()"></div>
+              <div class="form-group"><label>Fecha de entrega</label><input type="date" x-model="config.endDate" @change="saveConfig()"></div>
+              <div class="form-group"><label>Nota interna (no visible al cliente)</label><textarea x-model="config.internalNote" @change="saveConfig()"></textarea></div>
+              <button class="btn btn-primary btn-sm" @click="saveConfig();alert('Configuración guardada ✓')">Guardar</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🔗 Acceso del Portal Cliente</div></div>
+            <div class="card-body">
+              <div style="padding:1rem;background:var(--light);border-radius:.75rem;margin-bottom:1rem;font-size:.83rem;line-height:1.6">
+                <strong>Portal Graciela (cliente.html)</strong><br>
+                <span style="color:var(--muted)">Comparte el archivo <code>cliente.html</code> en GitHub Pages. El PIN de acceso es:</span><br><br>
+                <div style="font-size:1.6rem;font-weight:800;letter-spacing:.4rem;color:var(--pink)" x-text="clientPin"></div>
+                <br>
+                <span style="font-size:.75rem;color:var(--muted)">Para cambiar el PIN, edita la variable <code>CLIENT_PIN</code> en cliente.html</span>
+              </div>
+              <div style="padding:1rem;background:#fff0f8;border:1px solid #fce7f3;border-radius:.75rem;font-size:.8rem;color:#9d174d;line-height:1.5">
+                🔒 <strong>Este portal (director.html) permanece separado.</strong> Graciela solo ve <strong>cliente.html</strong>. Nunca compartas este link.
+              </div>
+              <div style="margin-top:1rem">
+                <div class="form-group"><label>Miro Embed URL</label><input type="url" x-model="miroUrl" placeholder="https://miro.com/app/live-embed/..." @change="localStorage.setItem('miroUrl',miroUrl)"></div>
+                <button class="btn btn-cyan btn-sm" @click="localStorage.setItem('miroUrl',miroUrl);alert('URL de Miro guardada ✓')">Guardar URL Miro</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.25rem">
+          <div class="card-header"><div class="card-title">📦 Instrucciones de Despliegue — GitHub Pages</div></div>
+          <div class="card-body" style="font-size:.83rem;line-height:1.8">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+              <div style="padding:1rem;background:var(--light);border-radius:.75rem">
+                <strong style="font-size:.88rem">Paso 1 — Crear repositorio</strong><br>
+                <span style="color:var(--muted)">En GitHub, crea un repositorio nuevo (ej. <code>arepa-portal</code>). Puede ser privado.</span>
+              </div>
+              <div style="padding:1rem;background:var(--light);border-radius:.75rem">
+                <strong style="font-size:.88rem">Paso 2 — Subir los 3 archivos</strong><br>
+                <span style="color:var(--muted)">Arrastra <code>index.html</code>, <code>cliente.html</code> y <code>director.html</code> al repositorio.</span>
+              </div>
+              <div style="padding:1rem;background:var(--light);border-radius:.75rem">
+                <strong style="font-size:.88rem">Paso 3 — Activar Pages</strong><br>
+                <span style="color:var(--muted)">Settings → Pages → Source: <em>Deploy from branch</em> → main → / (root) → Save.</span>
+              </div>
+              <div style="padding:1rem;background:#fff0f8;border:1px solid #fce7f3;border-radius:.75rem">
+                <strong style="font-size:.88rem;color:var(--pink)">Paso 4 — URLs resultantes</strong><br>
+                <span style="color:var(--muted)">Cliente: <code>https://[usuario].github.io/arepa-portal/cliente.html</code><br>Director: <code>https://[usuario].github.io/arepa-portal/director.html</code></span>
+              </div>
+            </div>
+            <div style="margin-top:1rem;padding:.9rem;background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;font-size:.78rem;color:#92400e">
+              💡 <strong>Tip:</strong> Comparte solo el link de <code>cliente.html</code> con Graciela. Guarda el link de <code>director.html</code> en un lugar seguro — es de acceso exclusivo.
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <!-- ═══ RESPALDO DE DATOS ═══ -->
+        <div class="card" style="margin-top:1.25rem">
+          <div class="card-header">
+            <div class="card-title">💾 Respaldo de Datos del Portal</div>
+            <span class="badge bg-amber" x-text="lastBackup?'Último: '+lastBackup:'Sin respaldo'"></span>
+          </div>
+          <div class="card-body">
+            <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.6">
+              Toda la información que capturas en este portal (Gantt, KPIs, riesgos, calidad, fotos, comunicaciones, etc.)
+              se guarda en tu navegador. Si limpias el caché o cambias de computadora, esos datos se perderían.
+              Exporta un respaldo periódicamente — es un archivo pequeño que puedes guardar en cualquier carpeta.
+            </p>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+              <button class="btn btn-cyan" @click="exportarRespaldo()" style="display:flex;align-items:center;gap:.5rem">
+                ⬇️ Exportar Respaldo (.json)
+              </button>
+              <label class="btn btn-outline" style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+                ⬆️ Importar Respaldo
+                <input type="file" accept=".json" @change="importarRespaldo($event)" style="display:none">
+              </label>
+            </div>
+            <div x-show="importMsg" x-transition style="margin-top:1rem;padding:.75rem 1rem;border-radius:.6rem"
+                 :class="importOk?'bg-green':''" :style="importOk?'background:#d1fae5;color:#065f46':'background:#fef2f2;color:#991b1b'"
+                 x-text="importMsg"></div>
+          </div>
+        </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── MODALES ─────────────────────────────────────── -->
+
+<!-- Modal: Nuevo mensaje -->
+<div class="modal-backdrop" x-show="showCommModal" @click.self="showCommModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nueva Entrada en Bitácora</div><button class="btn btn-ghost btn-sm" @click="showCommModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Tipo</label><select x-model="newComm.type"><option value="update">📊 Avance de Obra</option><option value="decision">🔑 Decisión</option><option value="issue">⚠️ Incidencia</option></select></div>
+      <div class="form-group"><label>Texto</label><textarea x-model="newComm.text" placeholder="Describe la actualización..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showCommModal=false">Cancelar</button><button class="btn btn-primary" @click="addComm()">Publicar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Riesgo -->
+<div class="modal-backdrop" x-show="showRiskModal" @click.self="showRiskModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" x-text="editRisk?'Editar Riesgo':'Agregar Riesgo'"></div><button class="btn btn-ghost btn-sm" @click="showRiskModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Descripción</label><textarea x-model="newRisk.desc"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Probabilidad</label><select x-model="newRisk.prob"><option>alta</option><option>media</option><option>baja</option></select></div>
+        <div class="form-group"><label>Impacto</label><select x-model="newRisk.impacto"><option>alto</option><option>medio</option><option>bajo</option></select></div>
+      </div>
+      <div class="form-group"><label>Nivel de riesgo</label><select x-model="newRisk.nivel"><option>alto</option><option>medio</option><option>bajo</option></select></div>
+      <div class="form-group"><label>Plan de Respuesta</label><textarea x-model="newRisk.plan"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showRiskModal=false">Cancelar</button><button class="btn btn-primary" @click="saveRisk()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Miro URL -->
+<div class="modal-backdrop" x-show="showMiroModal" @click.self="showMiroModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Configurar Tablero Miro</div><button class="btn btn-ghost btn-sm" @click="showMiroModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Embed URL de Miro</label><input type="url" x-model="miroUrl" placeholder="https://miro.com/app/live-embed/uXjVI...=/"></div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:.5rem">En Miro: Share → Embed → Copy embed link. Solo pega la URL, sin el tag &lt;iframe&gt;.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" @click="showMiroModal=false">Cancelar</button>
+      <button class="btn btn-primary" @click="saveMiro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cambio de alcance -->
+<div class="modal-backdrop" x-show="showChangeModal" @click.self="showChangeModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nueva Solicitud de Cambio</div><button class="btn btn-ghost btn-sm" @click="showChangeModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Descripción del cambio</label><textarea x-model="newChange.desc"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Impacto en Costo</label><input type="text" x-model="newChange.costImpact" placeholder="ej. +$12,000"></div>
+        <div class="form-group"><label>Impacto en Tiempo</label><input type="text" x-model="newChange.timeImpact" placeholder="ej. +3 días"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showChangeModal=false">Cancelar</button><button class="btn btn-primary" @click="addChange()">Registrar CR</button></div>
+  </div>
+</div>
+
+<!-- Modal: Stakeholder -->
+<div class="modal-backdrop" x-show="showStakeholderModal" @click.self="showStakeholderModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Agregar Involucrado</div><button class="btn btn-ghost btn-sm" @click="showStakeholderModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" x-model="newStakeholder.name"></div>
+        <div class="form-group"><label>Rol</label><input type="text" x-model="newStakeholder.role" placeholder="ej. Subcontratista"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Empresa / Especialidad</label><input type="text" x-model="newStakeholder.company"></div>
+        <div class="form-group"><label>Contacto</label><input type="text" x-model="newStakeholder.contact" placeholder="Tel o email"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Influencia</label><select x-model="newStakeholder.influencia"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+        <div class="form-group"><label>Interés</label><select x-model="newStakeholder.interes"><option>Alto</option><option>Medio</option><option>Bajo</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showStakeholderModal=false">Cancelar</button><button class="btn btn-primary" @click="addStakeholder()">Agregar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Documento -->
+<div class="modal-backdrop" x-show="showDocModal" @click.self="showDocModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Agregar Documento</div><button class="btn btn-ghost btn-sm" @click="showDocModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre del documento</label><input type="text" x-model="newDoc.name"></div>
+        <div class="form-group"><label>Tipo</label><select x-model="newDoc.type"><option value="legal">Legal</option><option value="tech">Técnico</option><option value="permit">Permiso</option><option value="invoice">Pago</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Fecha</label><input type="date" x-model="newDoc.dateRaw"></div>
+        <div class="form-group"><label>Icono (emoji)</label><input type="text" x-model="newDoc.icon" maxlength="2"></div>
+      </div>
+      <div class="form-group"><label>URL del documento (opcional)</label><input type="url" x-model="newDoc.url" placeholder="https://..."></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showDocModal=false">Cancelar</button><button class="btn btn-primary" @click="addDoc()">Agregar</button></div>
+  </div>
+</div>
+
+<script>
+const PM_PIN    = '1979';    // ← PIN PARA JOSÉ ANTONIO (cámbialo aquí)
+const CLIENT_PIN_DISPLAY = '2026'; // PIN de la cliente, mostrado en config (debe coincidir con cliente.html)
+
+function app(){
+  return {
+    unlocked:false, pinInput:'', pinError:'',
+    tab:'dashboard', sidebarOpen:false, commTab:'all', docTab:'all',
+    reportType:'weekly', reportPeriod:'Semana 1 · 18–21 Jun 2026', reportNarrative:'',
+    showCommModal:false, showRiskModal:false, showMiroModal:false, showChangeModal:false,
+    showStakeholderModal:false, showDocModal:false, showMilestoneModal:false,
+    miroUrl: localStorage.getItem('miroUrl')||'',
+    lastBackup: localStorage.getItem('arepa_lastBackup')||'',
+    importMsg:'', importOk:true,
+    ganttSaved:false, clientPin: CLIENT_PIN_DISPLAY,
+    todayPct:0,
+    editRisk:null,
+    newComm:{type:'update',text:''},
+    newRisk:{desc:'',prob:'media',impacto:'medio',nivel:'medio',plan:''},
+    newChange:{desc:'',costImpact:'',timeImpact:''},
+    newStakeholder:{name:'',role:'',company:'',contact:'',influencia:'Media',interes:'Medio'},
+    newDoc:{name:'',type:'legal',dateRaw:'',icon:'📄',url:''},
+    config:{projectName:'A-RE-PA',client:'Graciela Gutiérrez Ortega',startDate:'2026-06-18',endDate:'2026-08-21',internalNote:''},
+
+    init(){
+      if(sessionStorage.getItem('arepa_pm_auth')==='1') this.unlocked=true;
+      const gs=new Date('2026-06-18T12:00:00');
+      this.todayPct=Math.min(100,Math.max(0,(new Date()-gs)/86400000/64*100));
+      this.loadGantt(); this.loadKpi(); this.loadEvm(); this.loadRisks();
+      this.loadPayments(); this.loadQuality(); this.loadComms();
+      this.loadChanges(); this.loadDocs(); this.loadStakeholders(); this.loadConfig();
+    },
+    checkPin(){
+      if(this.pinInput===PM_PIN){ this.unlocked=true; sessionStorage.setItem('arepa_pm_auth','1'); }
+      else{ this.pinError='NIP incorrecto.'; setTimeout(()=>this.pinError='',2500); this.pinInput=''; }
+    },
+    logout(){ sessionStorage.removeItem('arepa_pm_auth'); this.unlocked=false; this.pinInput=''; },
+
+    tabTitle(){
+      const t={dashboard:'Dashboard · Director',scope:'Alcance',schedule:'Cronograma',cost:'Costos & EVM',risk:'Riesgos',quality:'Calidad',comms:'Comunicaciones',involucrados:'Involucrados',creative:'Taller Creativo',docs:'Documentos',reports:'Reportes',config:'Configuración'};
+      return t[this.tab]||'';
+    },
+    daysSinceStart(){ return Math.max(0,Math.floor((new Date()-new Date('2026-06-18T12:00:00'))/86400000)); },
+    fmtN(n){ return n.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}); },
+
+    gBarStyle(t){
+      const sd=t.rescheduled?this.dayFromStr(t.rescheduled):t.startDay;
+      const l=(sd/64*100).toFixed(3); const w=Math.max(.5,t.dur/64*100).toFixed(3);
+      return `left:${l}%;width:${w}%`;
+    },
+    gOrigStyle(t){
+      const l=(t.startDay/64*100).toFixed(3); const w=(t.dur/64*100).toFixed(3);
+      return `left:${l}%;width:${w}%`;
+    },
+    dayFromStr(ds){ const s=new Date('2026-06-18T12:00:00'); const d=new Date(ds+'T12:00:00'); return Math.max(0,Math.min(64,Math.floor((d-s)/86400000))); },
+    fmtDay(ds){ if(!ds)return''; return new Date(ds+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'}); },
+    showSaved(){ this.ganttSaved=true; setTimeout(()=>this.ganttSaved=false,3000); },
+    resetGantt(){ if(confirm('¿Borrar todas las reprogramaciones?')){ this.ganttTasks.forEach(t=>t.rescheduled=null); this.saveGantt(); } },
+
+    saveGantt(){ localStorage.setItem('arepa_gantt',JSON.stringify(this.ganttTasks.map(t=>({id:t.id,rescheduled:t.rescheduled,status:t.status})))); },
+    loadGantt(){
+      const s=localStorage.getItem('arepa_gantt'); if(!s)return;
+      JSON.parse(s).forEach(d=>{ const t=this.ganttTasks.find(x=>x.id===d.id); if(t){t.rescheduled=d.rescheduled;if(d.status)t.status=d.status;} });
+    },
+    saveKpi(){ localStorage.setItem('arepa_kpi',JSON.stringify(this.kpi)); },
+    loadKpi(){ const s=localStorage.getItem('arepa_kpi'); if(s)this.kpi=Object.assign(this.kpi,JSON.parse(s)); },
+    saveEvm(){ localStorage.setItem('arepa_evm',JSON.stringify(this.evm)); },
+    loadEvm(){ const s=localStorage.getItem('arepa_evm'); if(s)this.evm=Object.assign(this.evm,JSON.parse(s)); },
+    saveRisks(){ localStorage.setItem('arepa_risks',JSON.stringify(this.risks)); },
+    loadRisks(){ const s=localStorage.getItem('arepa_risks'); if(s)this.risks=JSON.parse(s); },
+    savePayments(){ localStorage.setItem('arepa_payments',JSON.stringify(this.payments)); },
+    loadPayments(){ const s=localStorage.getItem('arepa_payments'); if(s)this.payments=JSON.parse(s); },
+    saveQuality(){ localStorage.setItem('arepa_quality',JSON.stringify(this.qualityPhases)); },
+    loadQuality(){ const s=localStorage.getItem('arepa_quality'); if(s)this.qualityPhases=JSON.parse(s); },
+    saveComms(){ localStorage.setItem('arepa_comms',JSON.stringify(this.comms)); },
+    loadComms(){ const s=localStorage.getItem('arepa_comms'); if(s)this.comms=JSON.parse(s); },
+    saveChanges(){ localStorage.setItem('arepa_changes',JSON.stringify(this.changes)); },
+    loadChanges(){ const s=localStorage.getItem('arepa_changes'); if(s)this.changes=JSON.parse(s); },
+    saveDocs(){ localStorage.setItem('arepa_docs',JSON.stringify(this.documents)); },
+    loadDocs(){ const s=localStorage.getItem('arepa_docs'); if(s)this.documents=JSON.parse(s); },
+    loadStakeholders(){ const s=localStorage.getItem('arepa_stakeholders'); if(s)this.stakeholders=JSON.parse(s); },
+    saveConfig(){ localStorage.setItem('arepa_config',JSON.stringify(this.config)); },
+    loadConfig(){ const s=localStorage.getItem('arepa_config'); if(s)this.config=Object.assign(this.config,JSON.parse(s)); },
+
+    filteredDocs(){ return this.docTab==='all'?this.documents:this.documents.filter(d=>d.type===this.docTab); },
+    typeLabel(t){ const m={legal:'Legal',tech:'Técnico',permit:'Permiso',invoice:'Pago'}; return m[t]||t; },
+
+    addComm(){
+      if(!this.newComm.text.trim())return;
+      const d=new Date();
+      const ds=d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+      this.comms.unshift({id:Date.now(),from:'JAM',date:ds,type:this.newComm.type,text:this.newComm.text,read:true});
+      this.saveComms(); this.newComm={type:'update',text:''}; this.showCommModal=false;
+    },
+    openEditRisk(r){ this.editRisk=r; this.newRisk=Object.assign({},r); this.showRiskModal=true; },
+    saveRisk(){
+      if(!this.newRisk.desc.trim())return;
+      if(this.editRisk){
+        Object.assign(this.editRisk,this.newRisk);
+      } else {
+        this.risks.push({...this.newRisk,id:this.risks.length+1,status:'activo'});
+      }
+      this.saveRisks(); this.showRiskModal=false; this.editRisk=null;
+      this.newRisk={desc:'',prob:'media',impacto:'medio',nivel:'medio',plan:''};
+    },
+    removeRisk(id){ if(confirm('¿Eliminar riesgo?')){ this.risks=this.risks.filter(r=>r.id!==id); this.saveRisks(); } },
+    addChange(){
+      if(!this.newChange.desc.trim())return;
+      const d=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+      this.changes.push({id:this.changes.length+1,date:d,...this.newChange,status:'Solicitado',badge:'badge-amber'});
+      this.saveChanges(); this.newChange={desc:'',costImpact:'',timeImpact:''}; this.showChangeModal=false;
+    },
+    removeChange(id){ if(confirm('¿Eliminar CR?')){ this.changes=this.changes.filter(c=>c.id!==id); this.saveChanges(); } },
+    addStakeholder(){
+      if(!this.newStakeholder.name.trim())return;
+      this.stakeholders.push({id:this.stakeholders.length+1,...this.newStakeholder});
+      localStorage.setItem('arepa_stakeholders',JSON.stringify(this.stakeholders));
+      this.newStakeholder={name:'',role:'',company:'',contact:'',influencia:'Media',interes:'Medio'}; this.showStakeholderModal=false;
+    },
+    removeStakeholder(id){ if(confirm('¿Eliminar involucrado?')){ this.stakeholders=this.stakeholders.filter(s=>s.id!==id); localStorage.setItem('arepa_stakeholders',JSON.stringify(this.stakeholders)); } },
+    addDoc(){
+      if(!this.newDoc.name.trim())return;
+      const dtl=this.typeLabel(this.newDoc.type);
+      const dateStr=this.newDoc.dateRaw?new Date(this.newDoc.dateRaw+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+      this.documents.push({id:Date.now(),...this.newDoc,date:dateStr,size:'—',status:'pendiente',typeLabel:dtl});
+      this.saveDocs(); this.newDoc={name:'',type:'legal',dateRaw:'',icon:'📄',url:''}; this.showDocModal=false;
+    },
+    removeDoc(id){ if(confirm('¿Eliminar documento?')){ this.documents=this.documents.filter(d=>d.id!==id); this.saveDocs(); } },
+    toggleMilestone(m){ m.status=m.status==='done'?'pending':'done'; },
+    saveMiro(){ localStorage.setItem('miroUrl',this.miroUrl); this.showMiroModal=false; },
+
+    // ── DATA ─────────────────────────────────────────
+    kpi:{ avance:8, pagado:24222.37, spi:'1.00', cpi:'1.00', nota:'' },
+    evm:{ pv:24222.37, ev:24222.37, ac:24222.37, eac:293525 },
+    milestones:[
+      {id:1,date:'18 Jun 2026',title:'Inicio formal del Proyecto',sub:'Contrato + Pago 1',status:'done'},
+      {id:2,date:'18 Jun–03 Jul',title:'Fase 1 — Proyecto Ejecutivo',sub:'Ingenierías + renders',status:'active'},
+      {id:3,date:'03 Jul 2026',title:'Entrega Proyecto Ejecutivo',sub:'Planos + memorias',status:'pending'},
+      {id:4,date:'10 Jul 2026',title:'Aprobación + Pago 2 Anticipo',sub:'$107,720.98',status:'pending'},
+      {id:5,date:'13 Jul 2026',title:'Inicio Obra Civil',sub:'Movilización + trazo',status:'pending'},
+      {id:6,date:'21 Ago 2026',title:'Entrega Formal',sub:'Acta + Pago 8 Final',status:'pending'},
+    ],
+    ganttTasks:[
+      {id:1,name:'Levantamiento arquitectónico',startDay:0,dur:3,pred:'-',critical:false,color:'#9B5FD4',status:'En proceso',s0:'18 Jun',e0:'20 Jun',rescheduled:null},
+      {id:2,name:'Proyecto arquitectónico + renders',startDay:0,dur:11,pred:'1',critical:true,color:'#9B5FD4',status:'En proceso',s0:'18 Jun',e0:'28 Jun',rescheduled:null},
+      {id:3,name:'Proyecto estructural',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:4,name:'Proyecto hidráulico-sanitario',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:5,name:'Proyecto eléctrico',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:6,name:'Trámite Licencia Municipal (DUOT)',startDay:0,dur:23,pred:'-',critical:true,color:'#6d28d9',status:'En proceso',s0:'18 Jun',e0:'10 Jul',rescheduled:null},
+      {id:7,name:'Revisión presupuesto / Aprobación',startDay:18,dur:5,pred:'2,6',critical:true,color:'#00C8D7',status:'Pendiente',s0:'06 Jul',e0:'10 Jul',rescheduled:null},
+      {id:8,name:'Adecuaciones preliminares (registros/boiler)',startDay:25,dur:5,pred:'7',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'17 Jul',rescheduled:null},
+      {id:9,name:'Movilización y trazo',startDay:25,dur:4,pred:'7',critical:false,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'16 Jul',rescheduled:null},
+      {id:10,name:'Cimentación y estructura',startDay:28,dur:17,pred:'8,9',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'16 Jul',e0:'01 Ago',rescheduled:null},
+      {id:11,name:'Mampostería',startDay:44,dur:13,pred:'10',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'01 Ago',e0:'13 Ago',rescheduled:null},
+      {id:12,name:'Instalaciones (hidr., san., eléc.)',startDay:42,dur:15,pred:'10',critical:false,color:'#e11d48',status:'Pendiente',s0:'30 Jul',e0:'13 Ago',rescheduled:null},
+      {id:13,name:'Acabados: pisos, pintura, impermeab.',startDay:50,dur:12,pred:'11',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'07 Ago',e0:'18 Ago',rescheduled:null},
+      {id:14,name:'Carpintería y herrería',startDay:56,dur:7,pred:'12',critical:false,color:'#be185d',status:'Pendiente',s0:'13 Ago',e0:'19 Ago',rescheduled:null},
+      {id:15,name:'Limpieza final y Entrega Formal',startDay:62,dur:3,pred:'13,14',critical:true,color:'#2D2D2D',status:'Pendiente',s0:'19 Ago',e0:'21 Ago',rescheduled:null},
+    ],
+    payments:[
+      {id:1,no:'P1',tipo:'Proyecto Ejecutivo e Ingenierías',fecha:'18/06/2026',monto:24222.37,status:'pagado'},
+      {id:2,no:'P2',tipo:'Anticipo de Obra (40%)',fecha:'10/07/2026',monto:107720.98,status:'pendiente'},
+      {id:3,no:'S1',tipo:'Estimación Semana 1',fecha:'18/07/2026',monto:26930.24,status:'pendiente'},
+      {id:4,no:'S2',tipo:'Estimación Semana 2',fecha:'25/07/2026',monto:26930.24,status:'pendiente'},
+      {id:5,no:'S3',tipo:'Estimación Semana 3',fecha:'31/07/2026',monto:26930.24,status:'pendiente'},
+      {id:6,no:'S4',tipo:'Estimación Semana 4',fecha:'07/08/2026',monto:26930.24,status:'pendiente'},
+      {id:7,no:'S5',tipo:'Estimación Semana 5',fecha:'14/08/2026',monto:26930.24,status:'pendiente'},
+      {id:8,no:'S6',tipo:'Estimación Semana 6 + Entrega',fecha:'21/08/2026',monto:26930.26,status:'pendiente'},
+    ],
+    risks:[
+      {id:1,desc:'Retraso en licencia municipal (DUOT)',prob:'media',impacto:'alto',nivel:'alto',plan:'Trámite inmediato; seguimiento semanal; contingencia de 1 semana en programa',status:'activo'},
+      {id:2,desc:'Alza en precios de materiales',prob:'media',impacto:'medio',nivel:'medio',plan:'Cotizar anticipadamente; precio fijo en contrato',status:'activo'},
+      {id:3,desc:'Hallazgos imprevistos en cimentación',prob:'baja',impacto:'alto',nivel:'medio',plan:'Estudio mecánica de suelos; reserva contingencia',status:'activo'},
+      {id:4,desc:'Demora en pagos de la contratante',prob:'baja',impacto:'alto',nivel:'medio',plan:'Penalización 1%/sem.; suspensión a 2 sem. de mora',status:'activo'},
+      {id:5,desc:'Lluvias / eventos climáticos',prob:'baja',impacto:'medio',nivel:'bajo',plan:'Proteger materiales; cláusula fuerza mayor',status:'activo'},
+      {id:6,desc:'Escasez de mano de obra calificada',prob:'baja',impacto:'medio',nivel:'bajo',plan:'Pre-contratar cuadrilla; residente alterno',status:'activo'},
+      {id:7,desc:'Habitantes de 3.ª edad en recámara a intervenir — polvo, ruido, suciedad',prob:'alta',impacto:'medio',nivel:'alto',plan:'Barreras antipolvo/ruido; horario 08–18 h; barrido húmedo; comunicación constante con Graciela',status:'activo'},
+      {id:8,desc:'Ampliación sobre registros de drenaje y boiler activos de toda la casa',prob:'alta',impacto:'alto',nivel:'alto',plan:'Fase Adecuaciones Preliminares (Jul 13–17): mapear, reubicar/proteger registros y boiler; instalar accesos de mantenimiento antes de colar losa',status:'activo'},
+    ],
+    qualityPhases:[
+      {phase:'Fase 1 — Proyecto Ejecutivo',items:[
+        {id:1,desc:'Planos arq. a escala 1:50 firmados y sellados',norm:'RAS Torreón',done:false},
+        {id:2,desc:'Memoria de cálculo estructural — DRO',norm:'NTC Sismo',done:false},
+        {id:3,desc:'Proyecto hidráulico con isométricos',norm:'NOM-001-CONAGUA',done:false},
+        {id:4,desc:'Proyecto eléctrico con diagrama unifilar',norm:'NOM-001-SEDE',done:false},
+        {id:5,desc:'Licencia municipal obtenida y vigente',norm:'H. Ayuntamiento Torreón',done:false},
+      ]},
+      {phase:'Fase 2 — Construcción',items:[
+        {id:6,desc:"Concreto f'c=200 kg/cm² con cilindros de prueba",norm:'NMX-C-414',done:false},
+        {id:7,desc:'Acero fy=4200 kg/cm² — certificado de calidad',norm:'NMX-B-455',done:false},
+        {id:8,desc:'Impermeabilización 3 capas + prueba 72h',norm:'Manual IMCYC',done:false},
+        {id:9,desc:'Inst. eléctrica: prueba continuidad y aislamiento',norm:'NOM-001-SEDE',done:false},
+        {id:10,desc:'Inst. hidráulica: prueba hidrostática 1.5×',norm:'NOM-001-CONAGUA',done:false},
+      ]},
+    ],
+    comms:[
+      {id:1,from:'JAM',date:'18 Jun 2026 · 14:30',type:'update',text:'Proyecto iniciado formalmente. Contrato firmado, Pago 1 recibido. Portales activos.',read:true},
+      {id:2,from:'JAM',date:'19 Jun 2026 · 09:15',type:'update',text:'Inicio de levantamiento arquitectónico. Ingenierías en proceso.',read:true},
+    ],
+    changes:[],
+    documents:[
+      {id:1,name:'Subcontrato de Obra A-RE-PA-2026-001',type:'legal',typeLabel:'Legal',icon:'📑',date:'18 Jun 2026',size:'.docx',status:'firmado',url:null},
+      {id:2,name:'Anexo 2 — Presupuesto de Obra',type:'tech',typeLabel:'Técnico',icon:'📊',date:'18 Jun 2026',size:'.xlsx',status:'vigente',url:null},
+      {id:3,name:'Anexo 3 — Calendario y Pagos',type:'tech',typeLabel:'Técnico',icon:'📅',date:'18 Jun 2026',size:'.xlsx',status:'vigente',url:null},
+      {id:4,name:'Recibo de Pago No. 001 — Ingenierías',type:'invoice',typeLabel:'Pago',icon:'🧾',date:'18 Jun 2026',size:'.docx',status:'firmado',url:null},
+      {id:5,name:'Licencia Municipal de Construcción',type:'permit',typeLabel:'Permiso',icon:'🏛️',date:'Pendiente',size:'—',status:'en trámite',url:null},
+    ],
+    stakeholders:[
+      {id:1,name:'Graciela Gutiérrez Ortega',role:'Contratante',company:'Cliente final',contact:'N/A',influencia:'Alta',interes:'Alto'},
+      {id:2,name:'J.A. Martínez de la Rosa',role:'Director de Proyecto',company:'SMART Projects',contact:'amartinez@luxsystems.mx',influencia:'Alta',interes:'Alto'},
+      {id:3,name:'DRO (por confirmar)',role:'Director Responsable de Obra',company:'Externo',contact:'Por asignar',influencia:'Alta',interes:'Medio'},
+      {id:4,name:'H. Ayuntamiento Torreón',role:'Autoridad Municipal',company:'DUOT',contact:'www.torreon.gob.mx',influencia:'Alta',interes:'Bajo'},
+      {id:5,name:'Subcontratista de Obra Civil',role:'Contratista',company:'Por adjudicar',contact:'—',influencia:'Media',interes:'Alto'},
+    ],
+    wbsItems:[
+      {code:'1.0',name:'Gestión del Proyecto',desc:'PM, contratos, portal digital',color:'var(--dark)'},
+      {code:'1.1',name:'Proyecto Ejecutivo',desc:'Arquitectónico + ingenierías',color:'var(--purple)'},
+      {code:'1.2',name:'Permisos y Licencias',desc:'DUOT, dictámenes',color:'#6d28d9'},
+      {code:'1.3',name:'Adecuaciones Preliminares',desc:'Registros, boiler, accesos',color:'var(--pink)'},
+      {code:'1.4',name:'Cimentación y Estructura',desc:'Excavación, concreto, acero',color:'var(--pink)'},
+      {code:'1.5',name:'Albañilería y Cubierta',desc:'Muros, losa, mampostería',color:'#e11d48'},
+      {code:'1.6',name:'Instalaciones',desc:'Hidr., san., eléc.',color:'var(--cyan)'},
+      {code:'1.7',name:'Acabados',desc:'Pisos, pintura, impermeab.',color:'var(--amber)'},
+      {code:'1.8',name:'Carpintería y Herrería',desc:'Puertas, cancelería',color:'#be185d'},
+      {code:'1.9',name:'Entrega',desc:'Limpieza, acta, cierre',color:'var(--green)'},
+    ],
+  }
+}
+</script>
+</body>
+</html>

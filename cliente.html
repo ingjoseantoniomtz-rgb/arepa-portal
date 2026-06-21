@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Cliente · A-RE-PA · SMART Projects</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<style>
+:root{
+  --dark:#2D2D2D;--pink:#FF3EA5;--purple:#9B5FD4;--cyan:#00C8D7;
+  --bg:#F0F2F7;--surface:#fff;--border:#E4E7EF;
+  --text:#1A1D2E;--muted:#6B7280;--light:#F8F9FC;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--blue:#3B82F6;
+  --sidebar-w:242px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+[x-cloak]{display:none!important}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+
+/* PIN */
+.pin-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1d2e 0%,#0d0b1a 60%,#1a1125 100%);padding:2rem;gap:1.5rem}
+.pin-brand{font-size:2rem;font-weight:800;color:#fff;text-align:center}.pin-brand span{color:var(--cyan)}
+.pin-sub{font-size:.75rem;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;text-align:center}
+.pin-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:1.25rem;padding:2.5rem 2rem;width:100%;max-width:340px;text-align:center}
+.pin-card h2{font-size:1rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.pin-card p{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.5}
+.pin-input{width:100%;padding:.75rem 1rem;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:.75rem;color:#fff;font-size:1.5rem;letter-spacing:.5rem;text-align:center;font-family:'Inter',sans-serif;font-weight:700;outline:none;-webkit-text-security:disc;transition:border-color .2s}
+.pin-input:focus{border-color:var(--cyan)}
+.pin-btn{width:100%;margin-top:1rem;padding:.7rem;background:var(--cyan);color:#fff;border:none;border-radius:.75rem;font-size:.9rem;font-weight:700;transition:background .2s}
+.pin-btn:hover{background:#00b0be}
+.pin-error{font-size:.78rem;color:#fca5a5;margin-top:.5rem;min-height:1.1rem}
+.pin-hint{font-size:.7rem;color:rgba(255,255,255,.25);margin-top:.9rem}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--dark);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar-header{padding:1.4rem 1.2rem .9rem;border-bottom:1px solid rgba(255,255,255,.07)}
+.s-logo{font-size:1.05rem;font-weight:800;color:#fff}.s-logo span{color:var(--cyan)}
+.s-proj{font-size:.65rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-top:.2rem}
+.s-role{display:inline-flex;align-items:center;gap:.4rem;margin-top:.55rem;padding:.18rem .6rem;border-radius:999px;font-size:.68rem;font-weight:600;background:rgba(0,200,215,.15);color:var(--cyan)}
+.s-ver{display:inline-flex;align-items:center;gap:.3rem;margin-top:.4rem;padding:.15rem .55rem;border-radius:999px;font-size:.62rem;font-weight:700;background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);cursor:pointer;border:none;transition:all .15s}
+.s-ver:hover{color:#fff;background:rgba(255,255,255,.12)}
+.sidebar-nav{flex:1;overflow-y:auto;padding:.8rem 0}
+.nav-sec{padding:.35rem 1.2rem .15rem;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:1.5px;margin-top:.4rem}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.55rem 1.2rem;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.48);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav-item.active{color:#fff;background:rgba(0,200,215,.1);border-left-color:var(--cyan)}
+.nav-icon{width:17px;text-align:center;flex-shrink:0;font-size:.9rem}
+.nb{margin-left:auto;background:var(--pink);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .38rem;border-radius:999px}
+.sidebar-footer{padding:.9rem 1.2rem;border-top:1px solid rgba(255,255,255,.07)}
+.sf-name{font-size:.76rem;font-weight:600;color:rgba(255,255,255,.65)}
+.sf-email{font-size:.68rem;color:rgba(255,255,255,.3);margin-top:.1rem}
+.logout-btn{margin-top:.5rem;font-size:.7rem;color:rgba(255,255,255,.28);background:none;border:1px solid rgba(255,255,255,.1);padding:.28rem .7rem;border-radius:6px;cursor:pointer;transition:all .2s}
+.logout-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:.8rem 1.6rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:1rem;font-weight:700;flex:1}
+.content{padding:1.6rem;flex:1}
+.menu-toggle{display:none!important}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .85rem;border-radius:.5rem;font-size:.78rem;font-weight:600;border:none;cursor:pointer;transition:all .18s}
+.btn-primary{background:var(--cyan);color:#fff}.btn-primary:hover{background:#00b0be}
+.btn-outline{background:#fff;color:var(--text);border:1px solid var(--border)}.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-ghost{background:none;color:var(--muted);border:none}
+.btn-sm{padding:.28rem .6rem;font-size:.73rem}
+.btn-pink{background:var(--pink);color:#fff}.btn-pink:hover{background:#e02e8d}
+
+/* CARDS */
+.card{background:#fff;border-radius:.9rem;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.card-header{padding:1rem 1.3rem .8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.card-title{font-size:.88rem;font-weight:700}
+.card-body{padding:1.3rem}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1rem;margin-bottom:1.4rem}
+.kpi{background:#fff;border-radius:.9rem;padding:1.15rem 1.3rem;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.c-cyan::before{background:var(--cyan)}.kpi.c-pink::before{background:var(--pink)}.kpi.c-purple::before{background:var(--purple)}.kpi.c-green::before{background:var(--green)}.kpi.c-dark::before{background:var(--dark)}.kpi.c-amber::before{background:var(--amber)}
+.kpi-label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.45rem}
+.kpi-value{font-size:1.8rem;font-weight:800;color:var(--text);line-height:1}
+.kpi-sub{font-size:.7rem;color:var(--muted);margin-top:.3rem}
+.progress-bar{height:7px;background:#f0f2f7;border-radius:999px;overflow:hidden;margin:.4rem 0}
+.progress-fill{height:100%;border-radius:999px;transition:width .5s}
+.pf-cyan{background:linear-gradient(90deg,var(--cyan),#00b0be)}
+.pf-pink{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.pf-green{background:var(--green)}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.grid2 .span2{grid-column:span 2}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .55rem;border-radius:999px;font-size:.7rem;font-weight:600}
+.bg-green{background:#d1fae5;color:#065f46}.bg-amber{background:#fef3c7;color:#92400e}.bg-red{background:#fee2e2;color:#991b1b}.bg-blue{background:#dbeafe;color:#1e40af}.bg-purple{background:#ede9fe;color:#5b21b6}.bg-pink{background:#fce7f3;color:#9d174d}.bg-gray{background:#f3f4f6;color:#4b5563}.bg-cyan{background:#cffafe;color:#164e63}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{background:var(--light);border-bottom:2px solid var(--border)}
+th{padding:.6rem .9rem;text-align:left;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+td{padding:.7rem .9rem;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--light)}
+.td-r{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.td-c{text-align:center}
+
+/* STATUS BAR */
+.hero-bar{background:linear-gradient(135deg,var(--dark) 0%,#1a1125 100%);padding:1.2rem 1.6rem;border-radius:.9rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;color:#fff;gap:1rem;flex-wrap:wrap}
+.hero-bar h2{font-size:1.15rem;font-weight:800}
+.hero-bar p{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.15rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{padding:.28rem .75rem;border-radius:999px;font-size:.7rem;font-weight:600;border:1px solid rgba(255,255,255,.14)}
+.chip-green{background:rgba(16,185,129,.2);color:#6ee7b7;border-color:rgba(16,185,129,.3)}
+.chip-cyan{background:rgba(0,200,215,.2);color:#67e8f9;border-color:rgba(0,200,215,.3)}
+.chip-pink{background:rgba(255,62,165,.2);color:#f9a8d4;border-color:rgba(255,62,165,.3)}
+
+/* ACCORDION / TREE */
+.acc-chapter{border:1.5px solid var(--border);border-radius:.8rem;margin-bottom:.75rem;overflow:hidden}
+.acc-ch-header{display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem;cursor:pointer;background:var(--light);user-select:none;transition:background .15s}
+.acc-ch-header:hover{background:#e8ecf4}
+.acc-ch-code{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:#fff;flex-shrink:0}
+.acc-ch-name{flex:1;font-size:.85rem;font-weight:700}
+.acc-ch-meta{font-size:.72rem;color:var(--muted)}
+.chevron{font-size:.65rem;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.chevron.open{transform:rotate(90deg)}
+.acc-task-header{display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem .65rem 2.5rem;cursor:pointer;border-top:1px solid var(--border);background:#fff;user-select:none;transition:background .15s}
+.acc-task-header:hover{background:var(--light)}
+.acc-task-name{flex:1;font-size:.82rem;font-weight:600}
+.acc-task-meta{font-size:.7rem;color:var(--muted)}
+.acc-concepts{background:#fafbff}
+.acc-concept-row{display:grid;font-size:.78rem;padding:.45rem 1rem .45rem 3.5rem;border-top:1px solid var(--border);align-items:center;gap:.5rem}
+.acc-concept-row:hover{background:#f0f2f9}
+.concept-desc{flex:1}
+
+/* GANTT */
+.gantt-wrap{overflow-x:auto}
+.gantt-table{border-collapse:collapse;width:100%;min-width:650px;font-size:.77rem}
+.gantt-table th{background:var(--light);font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:.5rem .55rem;border-bottom:2px solid var(--border);white-space:nowrap}
+.gantt-table td{padding:.28rem .55rem;border-bottom:1px solid #f0f2f7;vertical-align:middle;white-space:nowrap}
+.phase-row td{background:linear-gradient(90deg,rgba(0,0,0,.04),rgba(0,0,0,.01));font-weight:700;font-size:.78rem;cursor:pointer}
+.phase-row:hover td{background:rgba(0,0,0,.05)}
+.task-row td{background:#fff}
+.task-row:hover td{background:var(--light)}
+.crit-row td{background:rgba(239,68,68,.018)!important}
+.g-id{width:24px;text-align:center;color:var(--muted);font-size:.68rem}
+.g-name{min-width:145px;max-width:175px;white-space:normal;line-height:1.3}
+.g-dt{width:56px;font-size:.68rem;color:var(--muted)}
+.g-pred{width:38px;text-align:center;color:var(--muted);font-size:.68rem}
+.g-chart-th,.g-chart-td{padding:0!important;position:relative;min-width:360px}
+.g-chart-td{height:30px}
+.g-chart-th,.g-chart-td{
+  background-image:linear-gradient(to right,#f4f6fa 0,#f4f6fa calc(50% - .5px),#e4e7ef calc(50% - .5px),#e4e7ef 50%,#fff 50%,#fff calc(100% - .5px),#e4e7ef calc(100% - .5px),#e4e7ef 100%);
+  background-size:21.875% 100%;background-repeat:repeat-x;
+}
+.wk-hdr{display:flex;height:28px;position:relative}
+.wk-lbl{flex:0 0 10.9375%;font-size:.58rem;font-weight:700;color:var(--muted);padding-left:.25rem;display:flex;align-items:center;border-left:1px solid var(--border)}
+.wk-lbl:first-child{border-left:none}.wk-lbl:last-child{flex:1}
+.gbar{position:absolute;height:15px;top:50%;transform:translateY(-50%);border-radius:3px;display:flex;align-items:center;padding:0 .3rem;overflow:hidden;white-space:nowrap;min-width:3px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.gbar.crit{background:var(--red)!important;box-shadow:0 1px 4px rgba(239,68,68,.35)}
+.gbar-lbl{font-size:.55rem;color:rgba(255,255,255,.9);font-weight:700}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:rgba(239,68,68,.75);z-index:20;pointer-events:none}
+.today-tag{position:absolute;top:3px;font-size:.52rem;font-weight:800;color:#fff;background:var(--red);padding:1px 4px;border-radius:3px;white-space:nowrap;transform:translateX(-50%)}
+.phase-bar{position:absolute;top:50%;transform:translateY(-50%);height:8px;border-radius:2px;opacity:.35}
+
+/* QUALITY SEMAPHORE */
+.sem{width:18px;height:18px;border-radius:50%;display:inline-block;flex-shrink:0;cursor:pointer}
+.sem-gray{background:#9ca3af}
+.sem-green{background:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,.2)}
+.sem-yellow{background:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,.2)}
+.sem-red{background:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.2);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* PHOTO SLOTS */
+.photo-slots{display:flex;gap:.35rem}
+.photo-slot{width:36px;height:36px;border:1.5px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .15s;background:#fafbff}
+.photo-slot:hover{border-color:var(--cyan)}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+.photo-slot .ph-icon{font-size:.75rem;color:var(--muted)}
+
+/* QUALITY TABLE ROW */
+.qa-row{display:grid;grid-template-columns:1fr 90px 28px 52px 80px 72px 36px;align-items:center;gap:.5rem;padding:.55rem .9rem;border-bottom:1px solid var(--border);font-size:.78rem}
+.qa-row:hover{background:var(--light)}
+.qa-header-row{background:var(--light);font-size:.64rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:.45rem .9rem;border-bottom:2px solid var(--border);display:grid;grid-template-columns:1fr 90px 28px 52px 80px 72px 36px;gap:.5rem}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:#fff;border-radius:1.1rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;max-height:88vh;overflow-y:auto}
+.modal-lg{max-width:680px}
+.modal-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fff;position:sticky;top:0;z-index:1}
+.modal-title{font-size:.95rem;font-weight:700}
+.modal-body{padding:1.4rem}
+.modal-footer{padding:.9rem 1.4rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.65rem;background:#fff;position:sticky;bottom:0}
+.form-group{margin-bottom:.9rem}
+label{font-size:.77rem;font-weight:600;display:block;margin-bottom:.3rem}
+input,select,textarea{width:100%;padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:.5rem;font-family:'Inter',sans-serif;font-size:.83rem;color:var(--text);outline:none;background:#fff;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,215,.08)}
+textarea{resize:vertical;min-height:70px}
+
+/* INNER TABS */
+.inner-tabs{display:flex;gap:.2rem;border-bottom:2px solid var(--border);margin-bottom:1.1rem}
+.inner-tab{padding:.45rem .85rem;font-size:.8rem;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.inner-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+/* COMMS FEED */
+.feed-item{display:flex;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff}
+.feed-body{flex:1}
+.feed-meta{font-size:.72rem;color:var(--muted);margin-bottom:.25rem}
+.feed-meta strong{color:var(--text);font-weight:600}
+.feed-tag{font-size:.65rem;padding:.1rem .35rem;border-radius:4px;background:var(--light);color:var(--muted);margin-left:.3rem}
+.feed-text{font-size:.83rem;line-height:1.55}
+
+/* DOCS */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.9rem}
+.doc-card{border:1.5px solid var(--border);border-radius:.8rem;padding:1rem;cursor:pointer;transition:all .18s;background:#fff}
+.doc-card:hover{border-color:var(--cyan);box-shadow:0 4px 14px rgba(0,200,215,.1)}
+.doc-icon{font-size:1.8rem;margin-bottom:.45rem}
+.doc-type{display:inline-block;padding:.08rem .38rem;border-radius:4px;font-size:.6rem;font-weight:700;text-transform:uppercase;margin-bottom:.4rem}
+.dt-legal{background:#ede9fe;color:#5b21b6}.dt-tech{background:#dbeafe;color:#1e40af}.dt-permit{background:#fef3c7;color:#92400e}.dt-invoice{background:#d1fae5;color:#065f46}
+.doc-name{font-size:.8rem;font-weight:600;margin-bottom:.2rem;line-height:1.3}
+.doc-meta{font-size:.68rem;color:var(--muted)}
+
+/* VERSIONS MODAL */
+.ver-item{padding:.75rem 0;border-bottom:1px solid var(--border)}
+.ver-item:last-child{border-bottom:none}
+.ver-tag{font-size:.78rem;font-weight:800;color:var(--cyan);margin-bottom:.2rem}
+.ver-date{font-size:.7rem;color:var(--muted)}
+.ver-changes{margin-top:.4rem;display:flex;flex-direction:column;gap:.25rem}
+.ver-change{font-size:.78rem;display:flex;gap:.4rem;align-items:flex-start}
+.ver-change::before{content:'•';color:var(--cyan);flex-shrink:0}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:.75rem;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+
+/* PRINT */
+@media print{
+  .sidebar,.topbar-actions,.no-print{display:none!important}
+  .main{margin-left:0!important}
+  .content{padding:.4in}
+  .card{break-inside:avoid;box-shadow:none}
+  body{background:#fff}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0!important}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}.grid2 .span2{grid-column:span 1}
+  .menu-toggle{display:flex!important;align-items:center}
+  .acc-concept-row{grid-template-columns:1fr auto auto auto!important}
+  .qa-row,.qa-header-row{grid-template-columns:1fr 28px 80px!important}
+  .qa-row>*:nth-child(2),.qa-row>*:nth-child(4),.qa-row>*:nth-child(6),.qa-row>*:nth-child(7){display:none}
+  .qa-header-row>*:nth-child(2),.qa-header-row>*:nth-child(4),.qa-header-row>*:nth-child(6),.qa-header-row>*:nth-child(7){display:none}
+}
+</style>
+</head>
+<body x-data="app()" x-init="init()">
+
+<!-- ═══ PIN ═══ -->
+<div class="pin-screen" x-show="!unlocked" x-transition>
+  <div>
+    <div class="pin-brand">SMART <span>Projects</span></div>
+    <div class="pin-sub">Portal de Seguimiento · A-RE-PA</div>
+  </div>
+  <div class="pin-card">
+    <div style="font-size:2.2rem;margin-bottom:.6rem">👩‍💼</div>
+    <h2>Bienvenida, Graciela</h2>
+    <p>Ingresa tu NIP para acceder al estado de tu proyecto</p>
+    <input class="pin-input" type="password" x-model="pinInput" maxlength="6" placeholder="••••••"
+           @keydown.enter="checkPin()" autocomplete="off" inputmode="numeric">
+    <div class="pin-error" x-text="pinError"></div>
+    <button class="pin-btn" @click="checkPin()">Acceder →</button>
+    <div class="pin-hint">NIP proporcionado por tu director de proyecto</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" x-show="unlocked" x-cloak>
+
+  <!-- overlay mobile -->
+  <div @click="sidebarOpen=false" :style="sidebarOpen?'display:block':'display:none'"
+       style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;display:none"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" :class="{open:sidebarOpen}">
+    <div class="sidebar-header">
+      <div class="s-logo">SMART <span>Projects</span></div>
+      <div class="s-proj">A-RE-PA · Torreón 2026</div>
+      <div class="s-role">👩‍💼 Portal Cliente</div>
+      <button class="s-ver" @click="showVersionModal=true">📦 v<span x-text="currentVersion"></span></button>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-sec">Resumen</div>
+      <div class="nav-item" :class="{active:tab==='dashboard'}" @click="nav('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="nav-sec">Gestión PMI</div>
+      <div class="nav-item" :class="{active:tab==='scope'}" @click="nav('scope')"><span class="nav-icon">📋</span>Alcance</div>
+      <div class="nav-item" :class="{active:tab==='schedule'}" @click="nav('schedule')"><span class="nav-icon">📅</span>Cronograma</div>
+      <div class="nav-item" :class="{active:tab==='cost'}" @click="nav('cost')"><span class="nav-icon">💰</span>Costos</div>
+      <div class="nav-item" :class="{active:tab==='risk'}" @click="nav('risk')"><span class="nav-icon">⚠️</span>Riesgos</div>
+      <div class="nav-item" :class="{active:tab==='quality'}" @click="nav('quality')"><span class="nav-icon">✅</span>Calidad</div>
+      <div class="nav-item" :class="{active:tab==='comms'}" @click="nav('comms')">
+        <span class="nav-icon">💬</span>Comunicaciones
+        <span class="nb" x-show="comms.filter(c=>!c.read).length>0" x-text="comms.filter(c=>!c.read).length"></span>
+      </div>
+      <div class="nav-sec">Herramientas</div>
+      <div class="nav-item" :class="{active:tab==='creative'}" @click="nav('creative')"><span class="nav-icon">🎨</span>Taller Creativo</div>
+      <div class="nav-item" :class="{active:tab==='docs'}" @click="nav('docs')"><span class="nav-icon">📁</span>Documentos</div>
+      <div class="nav-item" :class="{active:tab==='reports'}" @click="nav('reports')"><span class="nav-icon">📄</span>Reportes</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sf-name">Graciela Gutiérrez Ortega</div>
+      <div class="sf-email">graciela.gutierrezortega@gmail.com</div>
+      <button class="logout-btn" @click="logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="btn btn-ghost menu-toggle" style="padding:.3rem" @click="sidebarOpen=!sidebarOpen">☰</button>
+      <h1 x-text="tabTitle()"></h1>
+      <div class="topbar-actions" style="display:flex;align-items:center;gap:.6rem">
+        <span class="badge bg-green">🟢 En Ejecución</span>
+        <button class="btn btn-outline btn-sm no-print" @click="window.print()">📄 PDF</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div x-show="tab==='dashboard'">
+        <div class="hero-bar">
+          <div>
+            <h2>Proyecto A-RE-PA · Semana <span x-text="Math.ceil(daysSinceStart()/7)||1"></span></h2>
+            <p>Ampliación + Remodelación Recámara · Torreón, Coahuila</p>
+          </div>
+          <div class="chips">
+            <span class="chip chip-green">✓ Ingenierías Activas</span>
+            <span class="chip chip-cyan">Portal v<span x-text="currentVersion"></span></span>
+            <span class="chip chip-pink">Pago 1 Confirmado</span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi c-cyan">
+            <div class="kpi-label">Avance General</div>
+            <div class="kpi-value" x-text="kpi.avance+'%'"></div>
+            <div class="kpi-sub">Fase 1 en curso</div>
+            <div class="progress-bar"><div class="progress-fill pf-cyan" :style="'width:'+kpi.avance+'%'"></div></div>
+          </div>
+          <div class="kpi c-pink">
+            <div class="kpi-label">Inversión Realizada</div>
+            <div class="kpi-value">$24,222</div>
+            <div class="kpi-sub">de $293,525 total · 8.2%</div>
+          </div>
+          <div class="kpi c-purple">
+            <div class="kpi-label">Días Transcurridos</div>
+            <div class="kpi-value" x-text="daysSinceStart()"></div>
+            <div class="kpi-sub">de 64 días totales</div>
+          </div>
+          <div class="kpi c-green">
+            <div class="kpi-label">Pagos Completados</div>
+            <div class="kpi-value">1 / 8</div>
+            <div class="kpi-sub">Próximo: $107,721 · 10 Jul</div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Hitos del Proyecto</div><span class="badge bg-green">Al día</span></div>
+            <div class="card-body" style="padding:1rem">
+              <template x-for="m in milestones" :key="m.id">
+                <div style="display:flex;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
+                  <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:.25rem" :style="'background:'+(m.status==='done'?'var(--green)':m.status==='active'?'var(--pink)':'#e5e7eb')"></div>
+                  <div>
+                    <div style="font-size:.8rem;font-weight:600" x-text="m.title"></div>
+                    <div style="font-size:.7rem;color:var(--muted)" x-text="m.date"></div>
+                    <div style="font-size:.72rem;color:var(--muted)" x-text="m.sub"></div>
+                  </div>
+                  <span class="badge" :class="m.status==='done'?'bg-green':m.status==='active'?'bg-pink':'bg-gray'" style="margin-left:auto;align-self:flex-start" x-text="m.status==='done'?'✓':m.status==='active'?'▶':'—'"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Próximo Pago</div></div>
+            <div class="card-body" style="text-align:center">
+              <div style="font-size:2rem;font-weight:800;color:var(--dark);margin-bottom:.4rem">$107,720.98</div>
+              <div style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem">Anticipo de Obra Civil (40%)</div>
+              <span class="badge bg-amber">Vence: 10/07/2026</span>
+              <div style="margin-top:1rem;padding:.85rem;background:var(--light);border-radius:.65rem;font-size:.78rem;color:var(--muted);text-align:left;line-height:1.6">
+                Exigible al obtener licencia municipal y aprobación del presupuesto final.
+              </div>
+            </div>
+          </div>
+
+          <div class="card span2">
+            <div class="card-header">
+              <div class="card-title">Programa de Obra — Vista Rápida</div>
+              <button class="btn btn-ghost btn-sm" @click="nav('schedule')">Ver Gantt completo →</button>
+            </div>
+            <div class="card-body">
+              <template x-for="ph in phases" :key="ph.id">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.65rem">
+                  <div style="width:185px;flex-shrink:0;font-size:.78rem;font-weight:500" x-text="ph.name"></div>
+                  <div style="flex:1;height:22px;background:var(--light);border-radius:5px;position:relative;overflow:hidden">
+                    <div :style="'position:absolute;height:100%;left:'+ph.offset+'%;width:'+ph.width+'%;background:'+ph.color+';border-radius:5px;display:flex;align-items:center;padding:0 .4rem'" >
+                      <span style="font-size:.62rem;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden" x-text="ph.range"></span>
+                    </div>
+                  </div>
+                  <span class="badge" :class="ph.badge" x-text="ph.status" style="flex-shrink:0"></span>
+                </div>
+              </template>
+              <div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:.68rem;color:var(--muted)">
+                <span>◀ 18 Jun 2026</span><span>——— 64 días ———</span><span>21 Ago 2026 ▶</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ALCANCE ═══ -->
+      <div x-show="tab==='scope'">
+        <div class="card" style="margin-bottom:1.2rem">
+          <div class="card-header">
+            <div class="card-title">Enunciado del Alcance — Proyecto A-RE-PA</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-outline btn-sm" @click="scopeAllOpen(true)">Expandir todo</button>
+              <button class="btn btn-outline btn-sm" @click="scopeAllOpen(false)">Colapsar</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+            <!-- chapter column headers -->
+            <div style="display:grid;grid-template-columns:1fr 70px 60px 80px 90px;gap:.5rem;padding:.5rem 1rem .4rem;background:#f8f9fc;border-bottom:2px solid var(--border);font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">
+              <span>Concepto</span><span style="text-align:center">Unidad</span><span style="text-align:right">Cant.</span><span style="text-align:right">P.U.</span><span style="text-align:right">Importe</span>
+            </div>
+            <template x-for="ch in scopeChapters" :key="ch.id">
+              <div class="acc-chapter">
+                <!-- Chapter row -->
+                <div class="acc-ch-header" @click="ch.open=!ch.open">
+                  <div class="acc-ch-code" :style="'background:'+ch.color" x-text="ch.id"></div>
+                  <div class="acc-ch-name" x-text="ch.name"></div>
+                  <div class="acc-ch-meta" x-text="'$'+fmtN(chTotal(ch))"></div>
+                  <span class="chevron" :class="{open:ch.open}">▶</span>
+                </div>
+                <!-- Tasks -->
+                <div x-show="ch.open" x-transition>
+                  <template x-for="tk in ch.tasks" :key="tk.id">
+                    <div>
+                      <div class="acc-task-header" @click="tk.open=!tk.open">
+                        <span class="chevron" :class="{open:tk.open}" style="margin-left:.5rem">▶</span>
+                        <div class="acc-task-name" x-text="tk.id+' '+tk.name"></div>
+                        <div class="acc-task-meta" x-text="'$'+fmtN(taskTotal(tk))"></div>
+                        <span class="badge" :class="tk.status==='done'?'bg-green':tk.status==='active'?'bg-blue':'bg-gray'" x-text="tk.status==='done'?'✓ Concluido':tk.status==='active'?'▶ En proceso':'⏳ Pendiente'"></span>
+                      </div>
+                      <!-- Concepts -->
+                      <div class="acc-concepts" x-show="tk.open" x-transition>
+                        <template x-for="c in tk.concepts" :key="c.id">
+                          <div class="acc-concept-row" style="grid-template-columns:1fr 70px 60px 80px 90px">
+                            <span style="font-size:.77rem;color:var(--text)" x-text="c.desc"></span>
+                            <span style="font-size:.72rem;color:var(--muted);text-align:center" x-text="c.unit"></span>
+                            <span style="font-size:.77rem;text-align:right" x-text="c.qty"></span>
+                            <span style="font-size:.77rem;text-align:right;color:var(--muted)" x-text="'$'+fmtN(c.up)"></span>
+                            <span style="font-size:.77rem;font-weight:600;text-align:right" x-text="'$'+fmtN(c.qty*c.up)"></span>
+                          </div>
+                        </template>
+                        <!-- task subtotal -->
+                        <div style="display:grid;grid-template-columns:1fr 70px 60px 80px 90px;gap:.5rem;padding:.4rem 1rem .4rem 3.5rem;background:#f0f2f9;border-top:1px solid var(--border);font-size:.75rem;font-weight:700">
+                          <span style="grid-column:span 4;color:var(--muted)">Subtotal <span x-text="tk.id"></span></span>
+                          <span style="text-align:right" x-text="'$'+fmtN(taskTotal(tk))"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <!-- chapter subtotal -->
+                  <div style="display:grid;grid-template-columns:1fr 70px 60px 80px 90px;gap:.5rem;padding:.55rem 1rem;background:#e8ecf4;border-top:2px solid var(--border);font-size:.8rem;font-weight:800">
+                    <span style="grid-column:span 4" x-text="'SUBTOTAL '+ch.id+' (c/ind.+util.)'" ></span>
+                    <span style="text-align:right" x-text="'$'+fmtN(chTotal(ch))"></span>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- Grand total -->
+            <div style="display:grid;grid-template-columns:1fr 90px;padding:.9rem 1rem;background:var(--dark);color:#fff;font-size:.88rem;font-weight:800">
+              <span>PRESUPUESTO A EJECUTAR s/IVA</span>
+              <span style="text-align:right" x-text="'$'+fmtN(grandTotal())"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Change log -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Cambios de Alcance Autorizados</div><span class="badge bg-gray" x-text="changes.length+' registros'"></span></div>
+          <div class="card-body">
+            <div x-show="changes.length===0" style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.83rem">Sin cambios de alcance registrados.</div>
+            <div class="tbl-wrap" x-show="changes.length>0">
+              <table>
+                <thead><tr><th>#CR</th><th>Descripción</th><th>Impacto Costo</th><th>Impacto Tiempo</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <template x-for="ch in changes" :key="ch.id">
+                    <tr><td x-text="'CR-'+String(ch.id).padStart(3,'0')"></td><td x-text="ch.desc"></td><td class="td-r" x-text="ch.costImpact"></td><td x-text="ch.timeImpact"></td><td><span class="badge" :class="ch.status==='Aprobado'?'bg-green':ch.status==='Rechazado'?'bg-red':'bg-amber'" x-text="ch.status"></span></td></tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CRONOGRAMA ═══ -->
+      <div x-show="tab==='schedule'">
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;gap:.5rem">
+            <div class="card-title">Diagrama de Gantt — A-RE-PA</div>
+            <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+              <span style="display:flex;align-items:center;gap:.3rem;font-size:.7rem"><span style="width:9px;height:9px;border-radius:2px;background:var(--purple);display:inline-block"></span>Ing.</span>
+              <span style="display:flex;align-items:center;gap:.3rem;font-size:.7rem"><span style="width:9px;height:9px;border-radius:2px;background:var(--pink);display:inline-block"></span>Construcción</span>
+              <span style="display:flex;align-items:center;gap:.3rem;font-size:.7rem"><span style="width:9px;height:9px;border-radius:2px;background:var(--red);display:inline-block"></span>Ruta crítica</span>
+              <button class="btn btn-outline btn-sm" @click="ganttAllOpen(true)">Expandir</button>
+              <button class="btn btn-outline btn-sm" @click="ganttAllOpen(false)">Colapsar</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="gantt-wrap">
+              <table class="gantt-table">
+                <thead>
+                  <tr>
+                    <th class="g-id">#</th>
+                    <th class="g-name">Tarea / Fase</th>
+                    <th class="g-dt">Inicio</th>
+                    <th class="g-dt">Fin</th>
+                    <th class="g-pred">Pred</th>
+                    <th class="g-chart-th">
+                      <div class="wk-hdr">
+                        <div class="wk-lbl">18 Jun</div><div class="wk-lbl">25 Jun</div>
+                        <div class="wk-lbl">02 Jul</div><div class="wk-lbl">09 Jul</div>
+                        <div class="wk-lbl">16 Jul</div><div class="wk-lbl">23 Jul</div>
+                        <div class="wk-lbl">30 Jul</div><div class="wk-lbl">06 Ago</div>
+                        <div class="wk-lbl">13 Ago</div><div class="wk-lbl">20 Ago</div>
+                        <div class="today-line" :style="'left:'+todayPct+'%'" x-show="todayPct>0&&todayPct<100">
+                          <div class="today-tag">HOY</div>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="row in ganttFlatRows" :key="row._key">
+                    <tr :class="row.type==='phase'?'phase-row':(row.t&&row.t.critical?'crit-row task-row':'task-row')"
+                        @click="row.type==='phase'&&(row.ph.open=!row.ph.open)"
+                        :style="row.type==='phase'?'cursor:pointer':''">
+                      <!-- # -->
+                      <td class="g-id">
+                        <span x-show="row.type==='phase'" x-text="'F'+row.ph.id" style="color:var(--muted);font-size:.68rem"></span>
+                        <span x-show="row.type==='task'" x-text="row.t.id" style="font-size:.72rem;color:var(--muted)"></span>
+                      </td>
+                      <!-- Name -->
+                      <td class="g-name" :style="row.type==='task'?'padding-left:1.5rem':''">
+                        <template x-if="row.type==='phase'">
+                          <div style="display:flex;align-items:center;gap:.45rem">
+                            <span :style="'color:'+row.ph.color;font-size:.75rem" x-text="row.ph.open?'▼':'▶'"></span>
+                            <span style="font-weight:700;font-size:.82rem" x-text="row.ph.name"></span>
+                          </div>
+                        </template>
+                        <template x-if="row.type==='task'">
+                          <div style="display:flex;align-items:center;gap:.3rem">
+                            <span x-show="row.t.critical" style="color:var(--red);font-size:.55rem">●</span>
+                            <span x-text="row.t.name" :style="row.t.critical?'font-weight:600':''" style="font-size:.77rem"></span>
+                            <span x-show="row.t.rescheduled" style="font-size:.62rem;color:var(--amber)">↪ Reprog.</span>
+                          </div>
+                        </template>
+                      </td>
+                      <!-- Inicio -->
+                      <td class="g-dt">
+                        <span x-show="row.type==='phase'" x-text="row.ph.s0" style="font-weight:700;font-size:.7rem"></span>
+                        <span x-show="row.type==='task'" x-text="row.t.s0" style="font-size:.75rem"></span>
+                      </td>
+                      <!-- Fin -->
+                      <td class="g-dt">
+                        <span x-show="row.type==='phase'" x-text="row.ph.e0" style="font-weight:700;font-size:.7rem"></span>
+                        <span x-show="row.type==='task'" x-text="row.t.e0" style="font-size:.75rem"></span>
+                      </td>
+                      <!-- Pred -->
+                      <td class="g-pred">
+                        <span x-show="row.type==='phase'" style="color:var(--muted)">—</span>
+                        <span x-show="row.type==='task'" x-text="row.t.pred" style="font-size:.75rem"></span>
+                      </td>
+                      <!-- Chart -->
+                      <td class="g-chart-td">
+                        <template x-if="row.type==='phase'">
+                          <div class="phase-bar" :style="'left:'+row.ph.offset+'%;width:'+row.ph.width+'%;background:'+row.ph.color+'88'"></div>
+                        </template>
+                        <template x-if="row.type==='task'">
+                          <div class="gbar" :class="row.t.critical?'crit':''"
+                               :style="gBarStyle(row.t)+(row.t.critical?'':';background:'+row.t.color)">
+                            <span class="gbar-lbl" x-text="row.t.dur>=7?row.t.s0:''"></span>
+                          </div>
+                        </template>
+                        <div class="today-line" :style="'left:'+todayPct+'%'" x-show="todayPct>0&&todayPct<100"></div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.45rem 1rem;font-size:.68rem;color:var(--muted);border-top:1px solid var(--border)">
+              <span>◀ 18 Jun 2026</span><span>64 días · Ruta crítica en rojo</span><span>21 Ago 2026 ▶</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ COSTOS ═══ -->
+      <div x-show="tab==='cost'">
+        <div class="kpi-grid">
+          <div class="kpi c-dark"><div class="kpi-label">Contrato Original</div><div class="kpi-value">$293,525</div><div class="kpi-sub">A-RE-PA-2026-001</div></div>
+          <div class="kpi c-green"><div class="kpi-label">Pagado</div><div class="kpi-value">$24,222</div><div class="kpi-sub">Pago 1 — Ingenierías</div></div>
+          <div class="kpi c-amber"><div class="kpi-label">Saldo Pendiente</div><div class="kpi-value">$269,302</div><div class="kpi-sub">Obra civil restante</div></div>
+          <div class="kpi c-cyan"><div class="kpi-label">Cambios de Costo</div><div class="kpi-value" x-text="'$'+fmtN(costChangesTotal())"></div><div class="kpi-sub">Modificaciones autorizadas</div></div>
+        </div>
+
+        <!-- Cost breakdown expandable -->
+        <div class="card" style="margin-bottom:1.2rem">
+          <div class="card-header">
+            <div class="card-title">Presupuesto Detallado por Capítulo</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-outline btn-sm" @click="costAllOpen(true)">Expandir</button>
+              <button class="btn btn-outline btn-sm" @click="costAllOpen(false)">Colapsar</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+
+            <template x-for="ch in costChapters" :key="ch.id">
+              <div class="acc-chapter">
+                <div class="acc-ch-header" @click="ch.open=!ch.open">
+                  <div class="acc-ch-code" :style="'background:'+ch.color" x-text="ch.id"></div>
+                  <div class="acc-ch-name" x-text="ch.name"></div>
+                  <div class="acc-ch-meta">
+                    <span x-text="'$'+fmtN(costChTotal(ch,'orig'))"></span>
+                    <template x-if="costChTotal(ch,'adj')!==costChTotal(ch,'orig')">
+                      <span :style="'color:'+(costChTotal(ch,'adj')>costChTotal(ch,'orig')?'var(--red)':'var(--green)')" x-text="' → $'+fmtN(costChTotal(ch,'adj'))"></span>
+                    </template>
+                  </div>
+                  <span class="chevron" :class="{open:ch.open}">▶</span>
+                </div>
+                <div x-show="ch.open" x-transition style="overflow:auto">
+                  <table style="width:100%;border-collapse:collapse;font-size:.77rem;min-width:580px">
+                    <thead>
+                      <tr style="background:var(--surface);border-bottom:1px solid var(--border);font-size:.7rem;color:var(--muted);font-weight:600">
+                        <th style="padding:.3rem .6rem .3rem 2.75rem;text-align:left;width:38%">Concepto</th>
+                        <th style="padding:.3rem .5rem;text-align:center;width:7%">Unidad</th>
+                        <th style="padding:.3rem .5rem;text-align:right;width:8%">Cant.</th>
+                        <th style="padding:.3rem .5rem;text-align:right;width:12%">P.U.</th>
+                        <th style="padding:.3rem .5rem;text-align:right;width:12%">Importe Orig.</th>
+                        <th style="padding:.3rem .5rem;text-align:right;width:12%">Importe Ajust.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="c in ch.concepts" :key="c.id">
+                        <tr :style="c.adj&&c.adj!==c.qty?'background:#fffbeb':''" style="border-bottom:1px solid var(--border)">
+                          <td style="padding:.38rem .6rem .38rem 2.75rem;line-height:1.3" x-text="c.desc"></td>
+                          <td style="padding:.38rem .5rem;text-align:center;color:var(--muted);font-size:.72rem" x-text="c.unit"></td>
+                          <td style="padding:.38rem .5rem;text-align:right" x-text="c.qty"></td>
+                          <td style="padding:.38rem .5rem;text-align:right;color:var(--muted)" x-text="'$'+fmtN(c.up)"></td>
+                          <td style="padding:.38rem .5rem;text-align:right;font-weight:600" x-text="'$'+fmtN(c.qty*c.up)"></td>
+                          <td style="padding:.38rem .5rem;text-align:right;font-weight:600" :style="(c.adj||c.qty)*c.up>c.qty*c.up?'color:var(--red)':''" x-text="'$'+fmtN((c.adj||c.qty)*c.up)"></td>
+                        </tr>
+                      </template>
+                    </tbody>
+                    <tfoot>
+                      <tr style="background:var(--border);font-weight:800;font-size:.78rem;border-top:2px solid #b0b8c8">
+                        <td colspan="4" style="padding:.45rem .6rem .45rem 2.75rem" x-text="'SUBTOTAL '+ch.id"></td>
+                        <td style="padding:.45rem .5rem;text-align:right" x-text="'$'+fmtN(costChTotal(ch,'orig'))"></td>
+                        <td style="padding:.45rem .5rem;text-align:right" :style="costChTotal(ch,'adj')>costChTotal(ch,'orig')?'color:var(--red)':''" x-text="'$'+fmtN(costChTotal(ch,'adj'))"></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </template>
+            <div style="border-top:2px solid var(--border);background:#f8f9fc;border-radius:0 0 10px 10px;overflow:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:580px">
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:.6rem .9rem;font-weight:700;color:var(--text)">Subtotal Directo (A–K)</td>
+                  <td colspan="3" style="text-align:right;padding:.6rem .9rem;color:var(--muted);font-size:.78rem">$244,820.40</td>
+                  <td style="text-align:right;padding:.6rem .9rem;font-weight:700" x-text="'$'+fmtN(costGrandTotal('orig'))"></td>
+                  <td style="text-align:right;padding:.6rem .9rem;font-weight:700" :style="costGrandTotal('adj')>costGrandTotal('orig')?'color:var(--red)':'color:var(--text)'" x-text="'$'+fmtN(costGrandTotal('adj'))"></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);background:#fff">
+                  <td style="padding:.5rem .9rem;color:var(--muted);font-size:.78rem">+ Ingenierías — Pago 1 (facturado)</td>
+                  <td colspan="4" style="text-align:right;padding:.5rem .9rem;color:var(--green);font-weight:600;font-size:.78rem">$24,222.37</td>
+                  <td></td>
+                </tr>
+                <tr style="background:var(--dark);color:#fff">
+                  <td style="padding:.7rem .9rem;font-weight:800;font-size:.88rem" colspan="4">GRAN TOTAL DEL PROYECTO</td>
+                  <td colspan="2" style="text-align:right;padding:.7rem .9rem;font-weight:800;font-size:.95rem;color:#00C8D7">$293,524.81</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amortization table -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Tabla de Amortizaciones — 8 Pagos</div><span class="badge bg-green">1 de 8 pagado</span></div>
+          <div class="card-body">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Concepto</th><th>Fecha</th><th class="td-r">Monto Neto</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <template x-for="p in payments" :key="p.id">
+                    <tr :style="p.status==='pagado'?'opacity:.72':''">
+                      <td x-text="p.no"></td><td x-text="p.tipo"></td><td x-text="p.fecha"></td>
+                      <td class="td-r" style="font-weight:600" x-text="'$'+fmtN(p.monto)"></td>
+                      <td><span class="badge" :class="p.status==='pagado'?'bg-green':'bg-gray'" x-text="p.status==='pagado'?'✓ Pagado':'Pendiente'"></span></td>
+                    </tr>
+                  </template>
+                  <tr style="font-weight:800;background:var(--light)">
+                    <td colspan="3" style="text-align:right">TOTAL</td>
+                    <td class="td-r">$293,524.81</td><td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <p style="margin:.75rem 0 0;font-size:.73rem;color:var(--muted);font-style:italic">
+                * Todos los pagos son en efectivo y se registran sin IVA. En caso de que la cliente solicite
+                pago por transferencia, se emitirá factura y se aplicará IVA 16% sobre el monto correspondiente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ RIESGOS ═══ -->
+      <div x-show="tab==='risk'" x-ref="riskSection">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registro de Riesgos del Proyecto</div>
+            <span class="badge bg-red" x-text="risks.filter(r=>r.nivel==='alto').length+' riesgos altos'"></span>
+          </div>
+          <div class="card-body">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Descripción</th><th>Prob.</th><th>Impacto</th><th>Nivel</th><th>Plan de Respuesta</th></tr></thead>
+                <tbody>
+                  <template x-for="r in risks" :key="r.id">
+                    <tr :id="'risk-'+r.id">
+                      <td x-text="'R-'+String(r.id).padStart(3,'0')"></td>
+                      <td x-text="r.desc" style="max-width:200px;white-space:normal;font-size:.77rem"></td>
+                      <td><span class="badge" :class="r.prob==='alta'?'bg-red':r.prob==='media'?'bg-amber':'bg-blue'" x-text="r.prob"></span></td>
+                      <td><span class="badge" :class="r.impacto==='alto'?'bg-red':r.impacto==='medio'?'bg-amber':'bg-green'" x-text="r.impacto"></span></td>
+                      <td><span class="badge" :class="r.nivel==='alto'?'bg-red':r.nivel==='medio'?'bg-amber':'bg-green'" x-text="r.nivel"></span></td>
+                      <td style="font-size:.74rem;max-width:240px;white-space:normal" x-text="r.plan"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CALIDAD ═══ -->
+      <div x-show="tab==='quality'">
+        <!-- hidden file input -->
+        <input type="file" accept="image/*" style="display:none" x-ref="photoInput" @change="handlePhoto($event)">
+
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:center;gap:1.2rem;padding:.75rem 1.3rem;background:var(--light);border-bottom:1px solid var(--border);flex-wrap:wrap">
+            <span style="font-size:.78rem;font-weight:600">Semáforo:</span>
+            <span style="display:flex;align-items:center;gap:.35rem;font-size:.75rem"><span class="sem sem-green"></span> Calidad óptima</span>
+            <span style="display:flex;align-items:center;gap:.35rem;font-size:.75rem"><span class="sem sem-yellow"></span> Calidad regular</span>
+            <span style="display:flex;align-items:center;gap:.35rem;font-size:.75rem"><span class="sem sem-red"></span> Con problema → Plan de acción</span>
+            <span style="display:flex;align-items:center;gap:.35rem;font-size:.75rem"><span class="sem sem-gray"></span> Sin inicio</span>
+          </div>
+        </div>
+
+        <template x-for="ph in qualityPhases" :key="ph.phase">
+          <div class="card" style="margin-bottom:1rem">
+            <div class="card-header" style="cursor:pointer" @click="ph.open=!ph.open">
+              <div style="display:flex;align-items:center;gap:.7rem">
+                <span style="font-size:.82rem;font-weight:700" x-text="ph.phase"></span>
+                <span class="badge bg-gray" x-text="ph.items.length+' ítems'"></span>
+                <template x-if="ph.items.filter(i=>i.semaphore==='red').length>0">
+                  <span class="badge bg-red" x-text="ph.items.filter(i=>i.semaphore==='red').length+' problema(s)'"></span>
+                </template>
+                <template x-if="ph.items.filter(i=>i.semaphore==='green').length===ph.items.length">
+                  <span class="badge bg-green">✓ Fase óptima</span>
+                </template>
+              </div>
+              <span class="chevron" :class="{open:ph.open}" style="font-size:.75rem">▶</span>
+            </div>
+            <div x-show="ph.open" x-transition>
+              <!-- Header row -->
+              <div class="qa-header-row">
+                <span>Actividad / Concepto</span>
+                <span style="text-align:center">Estado</span>
+                <span style="text-align:center">Cal.</span>
+                <span style="text-align:center">Norma</span>
+                <span>Fotos</span>
+                <span style="text-align:center">Reportó</span>
+                <span></span>
+              </div>
+              <template x-for="item in ph.items" :key="item.id">
+                <div class="qa-row" :style="item.semaphore==='red'?'background:#fff8f8':item.semaphore==='green'?'background:#f0fdf4':''">
+                  <!-- name + norm -->
+                  <div>
+                    <div style="font-size:.78rem;font-weight:500" x-text="item.desc"></div>
+                    <div style="font-size:.68rem;color:var(--muted)" x-text="item.norm"></div>
+                  </div>
+                  <!-- status -->
+                  <div style="text-align:center">
+                    <span class="badge" :class="item.status==='done'?'bg-green':item.status==='active'?'bg-blue':'bg-gray'" style="font-size:.65rem" x-text="item.status==='done'?'✓ OK':item.status==='active'?'▶ En proceso':'⏳ Pend.'"></span>
+                  </div>
+                  <!-- semaphore -->
+                  <div style="text-align:center;display:flex;justify-content:center">
+                    <span class="sem" :class="'sem-'+item.semaphore" :title="item.semaphore==='green'?'Óptimo':item.semaphore==='yellow'?'Regular':item.semaphore==='red'?'Con problema':'Sin inicio'"></span>
+                  </div>
+                  <!-- norm short -->
+                  <div style="font-size:.68rem;color:var(--muted)" x-text="item.normShort||'—'"></div>
+                  <!-- photos -->
+                  <div class="photo-slots">
+                    <template x-for="idx in [0,1]" :key="idx">
+                      <div class="photo-slot" @click="triggerPhoto(item.id,idx)">
+                        <template x-if="item.photos&&item.photos[idx]">
+                          <img :src="item.photos[idx].url" :alt="'Foto '+(idx+1)" @click.stop="openLightbox(item.photos[idx].url)">
+                        </template>
+                        <template x-if="!item.photos||!item.photos[idx]">
+                          <span class="ph-icon">📷</span>
+                        </template>
+                      </div>
+                    </template>
+                  </div>
+                  <!-- reporter -->
+                  <div style="text-align:center;font-size:.72rem;color:var(--muted)" x-text="item.reporter==='pm'?'👷 Dir.':item.reporter==='client'?'👩‍💼 Cliente':'—'"></div>
+                  <!-- action -->
+                  <div>
+                    <template x-if="item.semaphore==='red'">
+                      <button class="btn btn-sm" style="background:#fee2e2;color:var(--red);border:1px solid #fecaca;padding:.2rem .4rem;font-size:.65rem" @click="goToRisk(item.riskId)">⚠️ Riesgo</button>
+                    </template>
+                  </div>
+                </div>
+                <!-- note row if exists -->
+                <template x-if="item.note">
+                  <div style="padding:.3rem .9rem .3rem 1.5rem;font-size:.74rem;color:var(--muted);background:var(--light);border-bottom:1px solid var(--border);font-style:italic" x-text="'📝 '+item.note"></div>
+                </template>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ═══ COMUNICACIONES ═══ -->
+      <div x-show="tab==='comms'">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Bitácora del Proyecto</div><button class="btn btn-primary btn-sm" @click="showCommModal=true">+ Enviar mensaje</button></div>
+          <div class="card-body">
+            <div class="inner-tabs">
+              <button class="inner-tab" :class="{active:commTab==='all'}" @click="commTab='all'">Todos</button>
+              <button class="inner-tab" :class="{active:commTab==='update'}" @click="commTab='update'">Avances</button>
+              <button class="inner-tab" :class="{active:commTab==='decision'}" @click="commTab='decision'">Decisiones</button>
+              <button class="inner-tab" :class="{active:commTab==='issue'}" @click="commTab='issue'">Consultas</button>
+            </div>
+            <template x-for="c in comms.filter(c=>commTab==='all'||c.type===commTab)" :key="c.id">
+              <div class="feed-item">
+                <div class="feed-av" :style="'background:'+(c.from==='JAM'?'var(--pink)':'var(--cyan)')"><span x-text="c.from==='JAM'?'JA':'GG'"></span></div>
+                <div class="feed-body">
+                  <div class="feed-meta">
+                    <strong x-text="c.from==='JAM'?'J.A. Martínez (Director)':'Graciela G.'"></strong>
+                    <span x-text="' · '+c.date"></span>
+                    <span class="feed-tag" x-text="c.type==='update'?'📊 Avance':c.type==='decision'?'🔑 Decisión':'💬 Consulta'"></span>
+                  </div>
+                  <div class="feed-text" x-text="c.text"></div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TALLER CREATIVO ═══ -->
+      <div x-show="tab==='creative'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎨 Tablero Colaborativo</div>
+            <button class="btn btn-primary btn-sm" @click="miroUrl&&window.open(miroUrl,'_blank')">↗ Abrir en Miro</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <template x-if="miroUrl">
+              <iframe :src="miroUrl" style="width:100%;height:580px;border:none;border-radius:0 0 .9rem .9rem" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+            </template>
+            <template x-if="!miroUrl">
+              <div style="height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:var(--muted);border-radius:0 0 .9rem .9rem">
+                <span style="font-size:2.5rem">🎨</span>
+                <div style="font-weight:600">Tablero Miro en configuración</div>
+                <div style="font-size:.8rem;max-width:320px;text-align:center">Tu director de proyecto activará este espacio para explorar materiales, colores y acabados de forma colaborativa.</div>
+                <span class="badge bg-amber">⏳ Próximamente</span>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.1rem">
+          <div class="card-header"><div class="card-title">Solicitudes de Revisión de Diseño</div><button class="btn btn-primary btn-sm" @click="showDesignModal=true">+ Nueva Solicitud</button></div>
+          <div class="card-body">
+            <div x-show="designRequests.length===0" style="text-align:center;padding:1.4rem;color:var(--muted);font-size:.82rem">Usa este espacio para solicitar cambios de materiales o acabados.</div>
+            <template x-for="d in designRequests" :key="d.id">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:.7rem;background:var(--light);border-radius:.6rem;margin-bottom:.45rem">
+                <div><div style="font-size:.8rem;font-weight:600" x-text="d.element"></div><div style="font-size:.73rem;color:var(--muted);margin-top:.1rem" x-text="d.desc"></div></div>
+                <span class="badge bg-amber">Pendiente</span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DOCUMENTOS ═══ -->
+      <div x-show="tab==='docs'">
+        <div class="inner-tabs no-print">
+          <button class="inner-tab" :class="{active:docTab==='all'}" @click="docTab='all'">Todos</button>
+          <button class="inner-tab" :class="{active:docTab==='legal'}" @click="docTab='legal'">Legal</button>
+          <button class="inner-tab" :class="{active:docTab==='tech'}" @click="docTab='tech'">Técnico</button>
+          <button class="inner-tab" :class="{active:docTab==='permit'}" @click="docTab='permit'">Permisos</button>
+          <button class="inner-tab" :class="{active:docTab==='invoice'}" @click="docTab='invoice'">Pagos</button>
+        </div>
+        <div class="doc-grid">
+          <template x-for="doc in docs.filter(d=>docTab==='all'||d.type===docTab)" :key="doc.id">
+            <div class="doc-card">
+              <div class="doc-icon" x-text="doc.icon"></div>
+              <div class="doc-type" :class="'dt-'+doc.type" x-text="doc.typeLabel"></div>
+              <div class="doc-name" x-text="doc.name"></div>
+              <div class="doc-meta" x-text="doc.date"></div>
+              <div style="margin-top:.45rem"><span class="badge" :class="doc.status==='firmado'?'bg-green':doc.status==='vigente'?'bg-blue':'bg-gray'" x-text="doc.status"></span></div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- ═══ REPORTES ═══ -->
+      <div x-show="tab==='reports'">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Opciones de Reporte</div></div>
+            <div class="card-body">
+              <div class="form-group"><label>Tipo</label><select x-model="reportType"><option value="weekly">Informe Semanal</option><option value="general">Informe General</option></select></div>
+              <div class="form-group"><label>Período</label><input type="text" x-model="reportPeriod" placeholder="Semana 1 · 18–21 Jun 2026"></div>
+              <button class="btn btn-primary" @click="window.print()" style="width:100%">📄 Descargar PDF</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Vista Previa</div></div>
+            <div class="card-body" style="font-size:.8rem;line-height:1.7">
+              <div style="display:flex;justify-content:space-between;padding-bottom:.9rem;border-bottom:3px solid var(--cyan);margin-bottom:1rem">
+                <div><div style="font-size:1rem;font-weight:800">SMART Projects</div><div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">A-RE-PA · Torreón 2026</div></div>
+                <div style="text-align:right"><div style="font-weight:700" x-text="reportType==='weekly'?'INFORME SEMANAL':'INFORME GENERAL'"></div><div style="font-size:.7rem;color:var(--muted)" x-text="reportPeriod"></div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.9rem">
+                <div style="background:var(--dark);color:#fff;border-radius:.5rem;padding:.6rem;text-align:center"><div style="font-size:1.1rem;font-weight:800" x-text="kpi.avance+'%'"></div><div style="font-size:.65rem;opacity:.7">Avance</div></div>
+                <div style="background:var(--cyan);color:#fff;border-radius:.5rem;padding:.6rem;text-align:center"><div style="font-size:1.1rem;font-weight:800">$24K</div><div style="font-size:.65rem;opacity:.7">Pagado</div></div>
+                <div style="background:var(--purple);color:#fff;border-radius:.5rem;padding:.6rem;text-align:center"><div style="font-size:1.1rem;font-weight:800">1.00</div><div style="font-size:.65rem;opacity:.7">IPC</div></div>
+              </div>
+              <div style="font-size:.68rem;color:var(--muted);border-top:1px solid var(--border);padding-top:.6rem;display:flex;justify-content:space-between">
+                <span>J.A. Martínez de la Rosa · SMART Projects</span>
+                <span x-text="new Date().toLocaleDateString('es-MX')"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ MODALES ═══ -->
+<!-- Comm -->
+<div class="modal-backdrop" x-show="showCommModal" @click.self="showCommModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Enviar Mensaje al Director</div><button class="btn btn-ghost btn-sm" @click="showCommModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Tipo</label><select x-model="newComm.type"><option value="issue">💬 Consulta</option><option value="decision">🔑 Decisión de diseño</option><option value="update">📊 Comentario</option></select></div>
+      <div class="form-group"><label>Mensaje</label><textarea x-model="newComm.text" placeholder="Escribe tu mensaje..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showCommModal=false">Cancelar</button><button class="btn btn-primary" @click="addComm()">Enviar</button></div>
+  </div>
+</div>
+
+<!-- Design request -->
+<div class="modal-backdrop" x-show="showDesignModal" @click.self="showDesignModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nueva Solicitud de Diseño</div><button class="btn btn-ghost btn-sm" @click="showDesignModal=false">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Elemento</label><select x-model="newDesign.element"><option>Piso / Acabados</option><option>Pintura / Colores</option><option>Accesorios sanitarios</option><option>Iluminación</option><option>Herrería / Carpintería</option><option>Otro</option></select></div>
+      <div class="form-group"><label>Descripción</label><textarea x-model="newDesign.desc" placeholder="¿Qué te gustaría revisar o cambiar?"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" @click="showDesignModal=false">Cancelar</button><button class="btn btn-primary" @click="addDesignReq()">Enviar</button></div>
+  </div>
+</div>
+
+<!-- Version modal -->
+<div class="modal-backdrop" x-show="showVersionModal" @click.self="showVersionModal=false" x-cloak>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📦 Control de Versiones</div><button class="btn btn-ghost btn-sm" @click="showVersionModal=false">✕</button></div>
+    <div class="modal-body">
+      <template x-for="v in versions" :key="v.ver">
+        <div class="ver-item">
+          <div style="display:flex;align-items:center;gap:.6rem">
+            <div class="ver-tag">v<span x-text="v.ver"></span></div>
+            <template x-if="v.ver===currentVersion"><span class="badge bg-cyan" style="font-size:.6rem">Actual</span></template>
+            <div class="ver-date" x-text="v.date+' · '+v.label"></div>
+          </div>
+          <div class="ver-changes">
+            <template x-for="ch in v.changes" :key="ch">
+              <div class="ver-change" x-text="ch"></div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" @click="showVersionModal=false">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" x-show="lightboxUrl" @click="lightboxUrl=null" x-cloak>
+  <img :src="lightboxUrl" alt="Foto">
+</div>
+
+<script>
+const CLIENT_PIN = '2026';
+
+function app(){
+  return {
+    unlocked:false, pinInput:'', pinError:'',
+    tab:'dashboard', sidebarOpen:false,
+    commTab:'all', docTab:'all',
+    reportType:'weekly', reportPeriod:'Semana 1 · 18–21 Jun 2026',
+    showCommModal:false, showDesignModal:false, showVersionModal:false,
+    miroUrl: localStorage.getItem('miroUrl')||'',
+    todayPct:0,
+    lightboxUrl:null,
+    photoTarget:null,
+    designRequests:[],
+    changes:[],
+    newComm:{type:'issue',text:''},
+    newDesign:{element:'Piso / Acabados',desc:''},
+    currentVersion:'1.1',
+    kpi:{ avance:8 },
+
+    init(){
+      if(sessionStorage.getItem('arepa_client_auth')==='1') this.unlocked=true;
+      const gs=new Date('2026-06-18T12:00:00');
+      this.todayPct=Math.min(100,Math.max(0,(new Date()-gs)/86400000/64*100));
+      this.loadGantt(); this.loadQualityPhotos();
+      // sync changes from PM localStorage if available
+      const ch=localStorage.getItem('arepa_changes'); if(ch)try{this.changes=JSON.parse(ch)}catch(e){}
+      const kp=localStorage.getItem('arepa_kpi'); if(kp)try{this.kpi=Object.assign(this.kpi,JSON.parse(kp))}catch(e){}
+    },
+
+    checkPin(){
+      if(this.pinInput===CLIENT_PIN){ this.unlocked=true; sessionStorage.setItem('arepa_client_auth','1'); }
+      else{ this.pinError='NIP incorrecto. Intenta de nuevo.'; setTimeout(()=>this.pinError='',2500); this.pinInput=''; }
+    },
+    logout(){ sessionStorage.removeItem('arepa_client_auth'); this.unlocked=false; this.pinInput=''; },
+    nav(t){ this.tab=t; this.sidebarOpen=false; },
+
+    tabTitle(){
+      const m={dashboard:'Dashboard',scope:'Alcance del Proyecto',schedule:'Cronograma',cost:'Costos',risk:'Riesgos',quality:'Control de Calidad',comms:'Comunicaciones',creative:'Taller Creativo',docs:'Documentos',reports:'Reportes'};
+      return m[this.tab]||'';
+    },
+    daysSinceStart(){ return Math.max(0,Math.floor((new Date()-new Date('2026-06-18T12:00:00'))/86400000)); },
+    fmtN(n){ if(!n&&n!==0)return'0.00'; return Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}); },
+
+    // Gantt – flat rows (Alpine v3: single root in x-for)
+    get ganttFlatRows(){
+      const rows=[];
+      for(const ph of this.ganttPhases){
+        rows.push({type:'phase',_key:'ph'+ph.id,ph});
+        if(ph.open){
+          for(const t of this.ganttTasks.filter(t=>ph.taskIds.includes(t.id))){
+            rows.push({type:'task',_key:'t'+t.id,t});
+          }
+        }
+      }
+      return rows;
+    },
+    ganttAllOpen(v){ this.ganttPhases.forEach(p=>p.open=v); },
+
+    // Gantt
+    gBarStyle(t){
+      const sd=t.rescheduled?this.dayFromStr(t.rescheduled):t.startDay;
+      return `left:${(sd/64*100).toFixed(3)}%;width:${Math.max(.5,t.dur/64*100).toFixed(3)}%`;
+    },
+    dayFromStr(ds){ const s=new Date('2026-06-18T12:00:00'),d=new Date(ds+'T12:00:00'); return Math.max(0,Math.min(64,Math.floor((d-s)/86400000))); },
+    loadGantt(){
+      const s=localStorage.getItem('arepa_gantt'); if(!s)return;
+      try{ JSON.parse(s).forEach(d=>{ const t=this.ganttTasks.find(x=>x.id===d.id); if(t){t.rescheduled=d.rescheduled;if(d.status)t.status=d.status;} }); }catch(e){}
+    },
+
+    // Scope
+    chTotal(ch){ if(ch.subtotal) return ch.subtotal*1.1; return ch.tasks.reduce((a,t)=>a+this.taskTotal(t),0); },
+    taskTotal(tk){ return tk.concepts.reduce((a,c)=>a+c.qty*c.up,0); },
+    grandTotal(){ return this.scopeChapters.reduce((a,ch)=>a+this.chTotal(ch),0); },
+    scopeAllOpen(v){ this.scopeChapters.forEach(ch=>{ch.open=v;ch.tasks.forEach(t=>t.open=v);}); },
+
+    // Cost
+    costChTotal(ch,mode){ if(mode==='orig'&&ch.subtotal) return ch.subtotal*1.1; return ch.concepts.reduce((a,c)=>{ const q=mode==='adj'?(c.adj||c.qty):c.qty; return a+q*c.up; },0); },
+    costGrandTotal(mode){ return this.costChapters.reduce((a,ch)=>a+this.costChTotal(ch,mode),0); },
+    costAllOpen(v){ this.costChapters.forEach(ch=>ch.open=v); },
+    costChangesTotal(){ return this.costGrandTotal('adj')-this.costGrandTotal('orig'); },
+
+    // Quality photos
+    triggerPhoto(itemId, idx){
+      this.photoTarget={itemId,idx};
+      this.$refs.photoInput.click();
+    },
+    handlePhoto(ev){
+      const file=ev.target.files[0]; if(!file||!this.photoTarget)return;
+      const reader=new FileReader();
+      reader.onload=(e)=>{
+        for(const ph of this.qualityPhases){
+          const item=ph.items.find(i=>i.id===this.photoTarget.itemId);
+          if(item){
+            if(!item.photos)item.photos=[null,null];
+            item.photos[this.photoTarget.idx]={name:file.name,url:e.target.result};
+            this.saveQualityPhotos(); break;
+          }
+        }
+        ev.target.value='';
+      };
+      reader.readAsDataURL(file);
+    },
+    saveQualityPhotos(){
+      const d={}; this.qualityPhases.forEach(ph=>ph.items.forEach(i=>{if(i.photos)d[i.id]=i.photos;}));
+      try{localStorage.setItem('arepa_qphotos',JSON.stringify(d));}catch(e){}
+    },
+    loadQualityPhotos(){
+      const s=localStorage.getItem('arepa_qphotos'); if(!s)return;
+      try{
+        const d=JSON.parse(s);
+        this.qualityPhases.forEach(ph=>ph.items.forEach(i=>{if(d[i.id])i.photos=d[i.id];}));
+      }catch(e){}
+    },
+    openLightbox(url){ this.lightboxUrl=url; },
+    goToRisk(riskId){ this.tab='risk'; this.$nextTick(()=>{ const el=document.getElementById('risk-'+riskId); if(el)el.scrollIntoView({behavior:'smooth',block:'center'}); }); },
+
+    // Comms
+    addComm(){
+      if(!this.newComm.text.trim())return;
+      const d=new Date();
+      const ds=d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+      this.comms.unshift({id:Date.now(),from:'GGO',date:ds,type:this.newComm.type,text:this.newComm.text,read:true});
+      this.newComm={type:'issue',text:''}; this.showCommModal=false;
+    },
+    addDesignReq(){
+      if(!this.newDesign.desc.trim())return;
+      this.designRequests.push({id:Date.now(),element:this.newDesign.element,desc:this.newDesign.desc});
+      this.newDesign={element:'Piso / Acabados',desc:''}; this.showDesignModal=false;
+    },
+
+    // ═══ DATA ═══
+    versions:[
+      { ver:'1.1', date:'20 Jun 2026', label:'Mejoras UI', changes:['Alcance por capítulos con cantidades de obra','Gantt expandible por fases','Desglose de costos por volumen','Semáforo de calidad con fotos','Control de versiones activado'] },
+      { ver:'1.0', date:'18 Jun 2026', label:'Lanzamiento', changes:['Portal activado y compartido con cliente','Datos iniciales del proyecto A-RE-PA cargados','Gantt, Riesgos, Costos y Comunicaciones activos','Acceso protegido por NIP'] },
+    ],
+
+    milestones:[
+      {id:1,date:'18 Jun 2026',title:'Inicio del Proyecto',sub:'Contrato + Pago 1',status:'done'},
+      {id:2,date:'18 Jun–03 Jul',title:'Fase 1 — Proyecto Ejecutivo',sub:'Ingenierías + renders',status:'active'},
+      {id:3,date:'03 Jul 2026',title:'Entrega Proyecto Ejecutivo',sub:'Planos + memorias',status:'pending'},
+      {id:4,date:'10 Jul 2026',title:'Pago 2 — Anticipo Obra',sub:'$107,720.98',status:'pending'},
+      {id:5,date:'13 Jul 2026',title:'Inicio Construcción',sub:'Fase 2 — Obra civil',status:'pending'},
+      {id:6,date:'21 Ago 2026',title:'Entrega Formal',sub:'Acta + Pago 8 Final',status:'pending'},
+    ],
+
+    phases:[
+      {id:1,name:'F1 — Ingenierías',offset:0,width:22,range:'18 Jun–03 Jul',status:'Activo',badge:'bg-blue',color:'var(--purple)'},
+      {id:2,name:'Revisión',offset:22,width:8,range:'06–10 Jul',status:'Pendiente',badge:'bg-gray',color:'var(--cyan)'},
+      {id:3,name:'F2 — Construcción',offset:30,width:70,range:'13 Jul–21 Ago',status:'Pendiente',badge:'bg-gray',color:'var(--pink)'},
+    ],
+
+    ganttPhases:[
+      {id:1,name:'Fase 1 — Proyecto Ejecutivo e Ingenierías',open:true,color:'var(--purple)',taskIds:[1,2,3,4,5,6],offset:0,width:35.9,s0:'18 Jun',e0:'10 Jul'},
+      {id:2,name:'Revisión / Aprobación',open:true,color:'var(--cyan)',taskIds:[7],offset:28.1,width:7.8,s0:'06 Jul',e0:'10 Jul'},
+      {id:3,name:'Fase 2 — Construcción',open:true,color:'var(--pink)',taskIds:[8,9,10,11,12,13,14,15],offset:39.1,width:60.9,s0:'13 Jul',e0:'21 Ago'},
+    ],
+
+    ganttTasks:[
+      {id:1,name:'Levantamiento arquitectónico',startDay:0,dur:3,pred:'-',critical:false,color:'#9B5FD4',status:'En proceso',s0:'18 Jun',e0:'20 Jun',rescheduled:null},
+      {id:2,name:'Proyecto arquitectónico + renders',startDay:0,dur:11,pred:'1',critical:true,color:'#9B5FD4',status:'En proceso',s0:'18 Jun',e0:'28 Jun',rescheduled:null},
+      {id:3,name:'Proyecto estructural',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:4,name:'Proyecto hidráulico-sanitario',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:5,name:'Proyecto eléctrico',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Pendiente',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:6,name:'Trámite Licencia Municipal (DUOT)',startDay:0,dur:23,pred:'-',critical:true,color:'#6d28d9',status:'En proceso',s0:'18 Jun',e0:'10 Jul',rescheduled:null},
+      {id:7,name:'Revisión presupuesto / Aprobación',startDay:18,dur:5,pred:'2,6',critical:true,color:'#00C8D7',status:'Pendiente',s0:'06 Jul',e0:'10 Jul',rescheduled:null},
+      {id:8,name:'Adecuaciones preliminares (registros/boiler)',startDay:25,dur:5,pred:'7',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'17 Jul',rescheduled:null},
+      {id:9,name:'Movilización, trazo y nivelación',startDay:25,dur:4,pred:'7',critical:false,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'16 Jul',rescheduled:null},
+      {id:10,name:'Cimentación y estructura de ampliación',startDay:28,dur:17,pred:'8,9',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'16 Jul',e0:'01 Ago',rescheduled:null},
+      {id:11,name:'Mampostería',startDay:44,dur:13,pred:'10',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'01 Ago',e0:'13 Ago',rescheduled:null},
+      {id:12,name:'Instalaciones (hidr., san., eléc.)',startDay:42,dur:15,pred:'10',critical:false,color:'#e11d48',status:'Pendiente',s0:'30 Jul',e0:'13 Ago',rescheduled:null},
+      {id:13,name:'Acabados: pisos, pintura, impermeab.',startDay:50,dur:12,pred:'11',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'07 Ago',e0:'18 Ago',rescheduled:null},
+      {id:14,name:'Carpintería y herrería',startDay:56,dur:7,pred:'12',critical:false,color:'#be185d',status:'Pendiente',s0:'13 Ago',e0:'19 Ago',rescheduled:null},
+      {id:15,name:'Limpieza final y Entrega Formal',startDay:62,dur:3,pred:'13,14',critical:true,color:'#2D2D2D',status:'Pendiente',s0:'19 Ago',e0:'21 Ago',rescheduled:null},
+    ],
+
+    scopeChapters:[
+      {id:'A',subtotal:10150.0,name:'Obras Preliminares',color:'#FF3EA5',open:false,tasks:[
+        {id:'A',name:'Trazo, demolición y desalojo',status:'pending',open:true,concepts:[
+          {id:'A-01',desc:'Trazo y nivelación de áreas de trabajo',unit:'m²',qty:37,up:140},
+          {id:'A-02',desc:'Demolición selectiva de muros y acabados',unit:'m²',qty:13.5,up:220},
+          {id:'A-03',desc:'Acarreo y desalojo de escombro',unit:'viaje',qty:4,up:500},
+        ]},
+      ]},
+      {id:'B',subtotal:72800.0,name:'Cimentación y Estructura',color:'#9B5FD4',open:false,tasks:[
+        {id:'B',name:'Obra de cimentación y elementos estructurales',status:'pending',open:true,concepts:[
+          {id:'B-01',desc:'Excavación de cepas y nivelación',unit:'m³',qty:8.4,up:500},
+          {id:'B-02',desc:'Plantilla de concreto simple fc=100 kg/cm²',unit:'m²',qty:24,up:210},
+          {id:'B-03',desc:'Zapatas corridas concreto armado fc=200',unit:'m³',qty:3.2,up:5000},
+          {id:'B-04',desc:'Trabes de liga 20×40 cm',unit:'m',qty:18,up:900},
+          {id:'B-05',desc:'Columnas 20×20 cm',unit:'m',qty:24,up:700},
+          {id:'B-06',desc:'Losa maciza e=12 cm fc=200 kg/cm²',unit:'m²',qty:24,up:600},
+          {id:'B-07',desc:'Acero de refuerzo fy=4200 (complemento)',unit:'kg',qty:1,up:160},
+        ]},
+      ]},
+      {id:'C',subtotal:45200.0,name:'Mampostería e Interiores',color:'#00C8D7',open:false,tasks:[
+        {id:'C',name:'Muros, castillos, dalas y aplanados',status:'pending',open:true,concepts:[
+          {id:'C-01',desc:'Muro de tabicón rojo recocido',unit:'m²',qty:48,up:350},
+          {id:'C-02',desc:'Castillos de concreto armado 15×15 cm',unit:'m',qty:32,up:330},
+          {id:'C-03',desc:'Dalas de cierre 20×20 cm',unit:'m',qty:24,up:270},
+          {id:'C-04',desc:'Aplanado de yeso interiores',unit:'m²',qty:86,up:100},
+          {id:'C-05',desc:'Aplanado de mortero exteriores',unit:'m²',qty:38,up:72.63},
+        ]},
+      ]},
+      {id:'D',subtotal:22300.0,name:'Instalación Hidráulica-Sanitaria',color:'#FF3EA5',open:false,tasks:[
+        {id:'D',name:'Red hidráulica y drenaje sanitario',status:'pending',open:true,concepts:[
+          {id:'D-01',desc:'Alimentación agua fría CPVC 3/4"',unit:'m',qty:14,up:380},
+          {id:'D-02',desc:'Red de distribución CPVC 1/2"',unit:'m',qty:22,up:310},
+          {id:'D-03',desc:'Drenaje sanitario PVC 4"',unit:'m',qty:18,up:350},
+          {id:'D-04',desc:'WC de piso con fluxómetro',unit:'pza',qty:1,up:1980},
+          {id:'D-05',desc:'Lavabo con mezcladora',unit:'pza',qty:1,up:1880},
+        ]},
+      ]},
+      {id:'E',subtotal:18800.0,name:'Instalación Eléctrica',color:'#9B5FD4',open:false,tasks:[
+        {id:'E',name:'Tablero, circuitos y luminarias',status:'pending',open:true,concepts:[
+          {id:'E-01',desc:'Tablero eléctrico 8 circuitos',unit:'pza',qty:1,up:5200},
+          {id:'E-02',desc:'Circuitos de iluminación calibre 12 AWG',unit:'circ.',qty:4,up:1900},
+          {id:'E-03',desc:'Circuitos de contactos calibre 12 AWG',unit:'circ.',qty:3,up:1700},
+          {id:'E-04',desc:'Contactos, apagadores y luminarias LED',unit:'pza',qty:12,up:75},
+        ]},
+      ]},
+      {id:'F',subtotal:12000.0,name:'Remodelación Área Existente (13 m²)',color:'#00C8D7',open:false,tasks:[
+        {id:'F',name:'Demolición, aplanados y reparación de losa',status:'pending',open:true,concepts:[
+          {id:'F-01',desc:'Demolición y retiro de acabados',unit:'m²',qty:13,up:180},
+          {id:'F-02',desc:'Aplanado fino de yeso',unit:'m²',qty:55,up:140},
+          {id:'F-03',desc:'Reparación de losa e impermeabilización',unit:'m²',qty:13,up:150},
+        ]},
+      ]},
+      {id:'G',subtotal:29419.01,name:'Pisos ★',color:'#FF3EA5',open:false,tasks:[
+        {id:'G',name:'Acabados en piso',status:'pending',open:true,concepts:[
+          {id:'G-01',desc:'Porcelanato 60×60 cm primera calidad',unit:'m²',qty:46.77,up:628.88},
+        ]},
+      ]},
+      {id:'H',subtotal:607.2,name:'Impermeabilización ★',color:'#9B5FD4',open:false,tasks:[
+        {id:'H',name:'Impermeabilizante elastomérico',status:'pending',open:true,concepts:[
+          {id:'H-01',desc:'Impermeabilizante elastomérico en cubiertas',unit:'Global',qty:1,up:607.20},
+        ]},
+      ]},
+      {id:'I',subtotal:15656.11,name:'Pintura ★',color:'#00C8D7',open:false,tasks:[
+        {id:'I',name:'Pintura vinílica muros, cielos y complemento',status:'pending',open:true,concepts:[
+          {id:'I-01',desc:'Pintura vinílica muros interiores',unit:'m²',qty:74,up:166.01},
+          {id:'I-02',desc:'Pintura vinílica cielos',unit:'m²',qty:19,up:171.73},
+          {id:'I-03',desc:'Complemento pintura (detalles y remates)',unit:'Global',qty:1,up:108.50},
+        ]},
+      ]},
+      {id:'J',subtotal:11788.08,name:'Carpintería y Herrería',color:'#FF3EA5',open:false,tasks:[
+        {id:'J',name:'Puertas, ventanas y protecciones',status:'pending',open:true,concepts:[
+          {id:'J-01',desc:'Puerta principal herrería forjada',unit:'pza',qty:1,up:4500},
+          {id:'J-02',desc:'Puertas interiores de madera (2 hojas)',unit:'pza',qty:2,up:2200},
+          {id:'J-03',desc:'Ventana aluminio con cristal 4 mm',unit:'m²',qty:4.8,up:481.27},
+          {id:'J-04',desc:'Protección de herrería fija en ventanas',unit:'m²',qty:2.4,up:241.25},
+        ]},
+      ]},
+      {id:'K',subtotal:6100.0,name:'Limpieza Final y Entrega',color:'#9B5FD4',open:false,tasks:[
+        {id:'K',name:'Limpieza y entrega formal',status:'pending',open:true,concepts:[
+          {id:'K-01',desc:'Limpieza general del inmueble',unit:'Global',qty:1,up:3500},
+          {id:'K-02',desc:'Entrega formal con pruebas operativas',unit:'Global',qty:1,up:2600},
+        ]},
+      ]},
+    ],
+
+    costChapters:[
+      {id:'A',name:'A — Obras Preliminares',color:'#FF3EA5',open:false,subtotal:10150,concepts:[
+        {id:'A-01',desc:'Trazo y nivelación de áreas de trabajo',unit:'m²',qty:37,up:154},
+        {id:'A-02',desc:'Demolición selectiva de muros y acabados',unit:'m²',qty:13.5,up:242},
+        {id:'A-03',desc:'Acarreo y desalojo de escombro',unit:'viaje',qty:4,up:550},
+      ]},
+      {id:'B',name:'B — Cimentación y Estructura',color:'#9B5FD4',open:false,subtotal:72800,concepts:[
+        {id:'B-01',desc:'Excavación de cepas y nivelación',unit:'m³',qty:8.4,up:550},
+        {id:'B-02',desc:'Plantilla de concreto simple fc=100',unit:'m²',qty:24,up:231},
+        {id:'B-03',desc:'Zapatas corridas concreto armado fc=200',unit:'m³',qty:3.2,up:5500},
+        {id:'B-04',desc:'Trabes de liga 20×40 cm',unit:'m',qty:18,up:990},
+        {id:'B-05',desc:'Columnas 20×20 cm',unit:'m',qty:24,up:770},
+        {id:'B-06',desc:'Losa maciza e=12 cm fc=200 kg/cm²',unit:'m²',qty:24,up:660},
+        {id:'B-07',desc:'Acero de refuerzo fy=4200 (complemento)',unit:'kg',qty:1,up:176},
+      ]},
+      {id:'C',name:'C — Mampostería e Interiores',color:'#00C8D7',open:false,subtotal:45200,concepts:[
+        {id:'C-01',desc:'Muro de tabicón rojo recocido',unit:'m²',qty:48,up:385},
+        {id:'C-02',desc:'Castillos de concreto armado 15×15 cm',unit:'m',qty:32,up:363},
+        {id:'C-03',desc:'Dalas de cierre 20×20 cm',unit:'m',qty:24,up:297},
+        {id:'C-04',desc:'Aplanado de yeso interiores',unit:'m²',qty:86,up:110},
+        {id:'C-05',desc:'Aplanado de mortero exteriores',unit:'m²',qty:38,up:79.89},
+      ]},
+      {id:'D',name:'D — Instalación Hidráulica-Sanitaria',color:'#FF3EA5',open:false,subtotal:22300,concepts:[
+        {id:'D-01',desc:'Alimentación agua fría CPVC 3/4"',unit:'m',qty:14,up:418},
+        {id:'D-02',desc:'Red de distribución CPVC 1/2"',unit:'m',qty:22,up:341},
+        {id:'D-03',desc:'Drenaje sanitario PVC 4"',unit:'m',qty:18,up:385},
+        {id:'D-04',desc:'WC de piso con fluxómetro',unit:'pza',qty:1,up:2178},
+        {id:'D-05',desc:'Lavabo con mezcladora',unit:'pza',qty:1,up:2068},
+      ]},
+      {id:'E',name:'E — Instalación Eléctrica',color:'#9B5FD4',open:false,subtotal:18800,concepts:[
+        {id:'E-01',desc:'Tablero eléctrico 8 circuitos',unit:'pza',qty:1,up:5720},
+        {id:'E-02',desc:'Circuitos de iluminación calibre 12 AWG',unit:'circ.',qty:4,up:2090},
+        {id:'E-03',desc:'Circuitos de contactos calibre 12 AWG',unit:'circ.',qty:3,up:1870},
+        {id:'E-04',desc:'Contactos, apagadores y luminarias LED',unit:'pza',qty:12,up:82.50},
+      ]},
+      {id:'F',name:'F — Remodelación Área Existente (13 m²)',color:'#00C8D7',open:false,subtotal:12000,concepts:[
+        {id:'F-01',desc:'Demolición y retiro de acabados',unit:'m²',qty:13,up:198},
+        {id:'F-02',desc:'Aplanado fino de yeso',unit:'m²',qty:55,up:154},
+        {id:'F-03',desc:'Reparación de losa e impermeabilización',unit:'m²',qty:13,up:165},
+      ]},
+      {id:'G',name:'G — Pisos ★',color:'#FF3EA5',open:false,subtotal:29419.01,concepts:[
+        {id:'G-01',desc:'Porcelanato 60×60 cm primera calidad',unit:'m²',qty:46.77,up:691.77},
+      ]},
+      {id:'H',name:'H — Impermeabilización ★',color:'#9B5FD4',open:false,subtotal:607.20,concepts:[
+        {id:'H-01',desc:'Impermeabilizante elastomérico en cubiertas',unit:'Global',qty:1,up:667.92},
+      ]},
+      {id:'I',name:'I — Pintura ★',color:'#00C8D7',open:false,subtotal:15656.11,concepts:[
+        {id:'I-01',desc:'Pintura vinílica muros interiores',unit:'m²',qty:74,up:182.61},
+        {id:'I-02',desc:'Pintura vinílica cielos',unit:'m²',qty:19,up:188.90},
+        {id:'I-03',desc:'Complemento pintura (detalles y remates)',unit:'Global',qty:1,up:119.35},
+      ]},
+      {id:'J',name:'J — Carpintería y Herrería',color:'#FF3EA5',open:false,subtotal:11788.08,concepts:[
+        {id:'J-01',desc:'Puerta principal herrería forjada',unit:'pza',qty:1,up:4950},
+        {id:'J-02',desc:'Puertas interiores de madera (2 hojas)',unit:'pza',qty:2,up:2420},
+        {id:'J-03',desc:'Ventana aluminio con cristal 4 mm',unit:'m²',qty:4.8,up:529.40},
+        {id:'J-04',desc:'Protección herrería fija en ventanas',unit:'m²',qty:2.4,up:265.38},
+      ]},
+      {id:'K',name:'K — Limpieza Final y Entrega',color:'#9B5FD4',open:false,subtotal:6100,concepts:[
+        {id:'K-01',desc:'Limpieza general del inmueble',unit:'Global',qty:1,up:3850},
+        {id:'K-02',desc:'Entrega formal con pruebas operativas',unit:'Global',qty:1,up:2860},
+      ]},
+    ],
+
+    payments:[
+      {id:1,no:'P1',tipo:'Proyecto Ejecutivo e Ingenierías',fecha:'18/06/2026',monto:24222.37,status:'pagado'},
+      {id:2,no:'P2',tipo:'Anticipo de Obra (40%)',fecha:'10/07/2026',monto:107720.98,status:'pendiente'},
+      {id:3,no:'S1',tipo:'Estimación Semana 1',fecha:'18/07/2026',monto:26930.24,status:'pendiente'},
+      {id:4,no:'S2',tipo:'Estimación Semana 2',fecha:'25/07/2026',monto:26930.24,status:'pendiente'},
+      {id:5,no:'S3',tipo:'Estimación Semana 3',fecha:'31/07/2026',monto:26930.24,status:'pendiente'},
+      {id:6,no:'S4',tipo:'Estimación Semana 4',fecha:'07/08/2026',monto:26930.24,status:'pendiente'},
+      {id:7,no:'S5',tipo:'Estimación Semana 5',fecha:'14/08/2026',monto:26930.24,status:'pendiente'},
+      {id:8,no:'S6',tipo:'Estimación Semana 6 + Entrega',fecha:'21/08/2026',monto:26930.26,status:'pendiente'},
+    ],
+
+    risks:[
+      {id:1,desc:'Retraso en licencia municipal (DUOT)',prob:'media',impacto:'alto',nivel:'alto',plan:'Trámite inmediato; seguimiento semanal; contingencia 1 semana'},
+      {id:2,desc:'Alza en precios de materiales',prob:'media',impacto:'medio',nivel:'medio',plan:'Cotizar anticipadamente; precio fijo en contrato'},
+      {id:3,desc:'Hallazgos imprevistos en cimentación existente',prob:'baja',impacto:'alto',nivel:'medio',plan:'Estudio mecánica de suelos en Fase 1; reserva de contingencia'},
+      {id:4,desc:'Demora en pagos por parte de la contratante',prob:'baja',impacto:'alto',nivel:'medio',plan:'Penalización 1%/sem.; suspensión a las 2 semanas de mora'},
+      {id:5,desc:'Lluvias / eventos climáticos extremos',prob:'baja',impacto:'medio',nivel:'bajo',plan:'Proteger materiales y colados; cláusula fuerza mayor'},
+      {id:6,desc:'Escasez de mano de obra calificada',prob:'baja',impacto:'medio',nivel:'bajo',plan:'Pre-contratar cuadrilla; residente alterno identificado'},
+      {id:7,desc:'Habitantes de 3.ª edad en recámara a intervenir — polvo, ruido, suciedad',prob:'alta',impacto:'medio',nivel:'alto',plan:'Barreras antipolvo/ruido; horario 08–18 h; barrido húmedo diario; comunicación constante con Graciela'},
+      {id:8,desc:'Ampliación sobre registros de drenaje y boiler activos de toda la casa',prob:'alta',impacto:'alto',nivel:'alto',plan:'Adecuaciones Preliminares (Jul 13–17): mapear, reubicar y proteger registros y boiler; instalar accesos de mantenimiento antes de colar losa'},
+    ],
+
+    qualityPhases:[
+      {phase:'Fase 1 — Proyecto Ejecutivo',open:true,items:[
+        {id:101,desc:'Planos arquitectónicos a escala 1:50',norm:'RAS Torreón',normShort:'RAS',status:'active',semaphore:'gray',reporter:'pm',photos:[null,null],note:''},
+        {id:102,desc:'Memoria de cálculo estructural — firmada por DRO',norm:'NTC Sismo',normShort:'NTC',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
+        {id:103,desc:'Proyecto hidráulico con isométricos',norm:'NOM-001-CONAGUA',normShort:'CONAGUA',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
+        {id:104,desc:'Proyecto eléctrico con diagrama unifilar',norm:'NOM-001-SEDE',normShort:'SEDE',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
+        {id:105,desc:'Licencia municipal obtenida y vigente',norm:'H. Ayuntamiento Torreón',normShort:'Mun.',status:'active',semaphore:'gray',reporter:'pm',photos:[null,null],note:'En trámite desde el 18 Jun'},
+      ]},
+      {phase:'Fase 2 — Construcción',open:false,items:[
+        {id:201,desc:"Concreto fc=200 kg/cm² — cilindros de prueba",norm:'NMX-C-414',normShort:'NMX-C',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:202,desc:'Acero fy=4200 kg/cm² — certificado de calidad',norm:'NMX-B-455',normShort:'NMX-B',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:203,desc:'Impermeabilización 3 capas + prueba estanqueidad 72h',norm:'Manual IMCYC',normShort:'IMCYC',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:204,desc:'Instalación eléctrica: prueba de continuidad y aislamiento',norm:'NOM-001-SEDE',normShort:'SEDE',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:205,desc:'Instalación hidráulica: prueba hidrostática 1.5× presión',norm:'NOM-001-CONAGUA',normShort:'CONAGUA',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:206,desc:'Registros sanitarios y boiler reubicados y documentados',norm:'Reporte fotográfico',normShort:'Foto',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:8},
+        {id:207,desc:'Porcelanato: nivel, juntas y adherencia correctos',norm:'NMX-C-228',normShort:'NMX-C',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+        {id:208,desc:'Pintura: acabado parejo sin mancha ni burbujas',norm:'Especificación de proyecto',normShort:'Espec.',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
+      ]},
+    ],
+
+    comms:[
+      {id:1,from:'JAM',date:'18 Jun 2026 · 14:30',type:'update',text:'Proyecto iniciado formalmente. Contrato firmado, Pago 1 recibido ($24,222.37). Comenzamos levantamiento arquitectónico. Portal digital activo. ¡Bienvenida, Graciela!',read:true},
+      {id:2,from:'JAM',date:'20 Jun 2026 · 09:15',type:'update',text:'Portal actualizado a v1.1 — ahora incluye desglose de alcance por capítulos, Gantt expandible, costos por volumen, semáforo de calidad y control de versiones.',read:false},
+    ],
+
+    docs:[
+      {id:1,name:'Subcontrato de Obra A-RE-PA-2026-001',type:'legal',typeLabel:'Legal',icon:'📑',date:'18 Jun 2026',status:'firmado'},
+      {id:2,name:'Anexo 2 — Presupuesto de Obra',type:'tech',typeLabel:'Técnico',icon:'📊',date:'18 Jun 2026',status:'vigente'},
+      {id:3,name:'Anexo 3 — Calendario y Pagos',type:'tech',typeLabel:'Técnico',icon:'📅',date:'18 Jun 2026',status:'vigente'},
+      {id:4,name:'Recibo de Pago No. 001 — Ingenierías',type:'invoice',typeLabel:'Pago',icon:'🧾',date:'18 Jun 2026',status:'firmado'},
+      {id:5,name:'Licencia Municipal de Construcción',type:'permit',typeLabel:'Permiso',icon:'🏛️',date:'En trámite',status:'en trámite'},
+      {id:6,name:'Estudio de Mecánica de Suelos',type:'tech',typeLabel:'Técnico',icon:'🔬',date:'Pendiente',status:'pendiente'},
+    ],
+  }
+}
+</script>
+</body>
+</html>
