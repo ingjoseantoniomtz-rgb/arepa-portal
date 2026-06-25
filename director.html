@@ -1049,6 +1049,47 @@ function app(){
     loadPayments(){ const s=localStorage.getItem('arepa_payments'); if(s)this.payments=JSON.parse(s); },
     saveQuality(){ localStorage.setItem('arepa_quality',JSON.stringify(this.qualityPhases)); },
     loadQuality(){ const s=localStorage.getItem('arepa_quality'); if(s)this.qualityPhases=JSON.parse(s); },
+    exportarRespaldo(){
+      const keys=['arepa_gantt','arepa_kpi','arepa_payments','arepa_changes',
+                  'arepa_risks','arepa_quality','arepa_comms','arepa_stakeholders',
+                  'arepa_docs','arepa_evm','arepa_config','miroUrl'];
+      const data={_fecha:new Date().toLocaleString('es-MX'),_proyecto:'A-RE-PA'};
+      keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) data[k]=v; });
+      const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='AREPA-respaldo-'+new Date().toISOString().slice(0,10)+'.json';
+      a.click();
+      this.lastBackup=new Date().toLocaleString('es-MX',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      localStorage.setItem('arepa_lastBackup',this.lastBackup);
+    },
+    importarRespaldo(ev){
+      const file=ev.target.files[0];
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=(e)=>{
+        try{
+          const data=JSON.parse(e.target.result);
+          if(!data._proyecto||data._proyecto!=='A-RE-PA'){
+            this.importMsg='⚠ Archivo inválido — no es un respaldo de A-RE-PA';
+            this.importOk=false; return;
+          }
+          const keys=['arepa_gantt','arepa_kpi','arepa_payments','arepa_changes',
+                      'arepa_risks','arepa_quality','arepa_comms','arepa_stakeholders',
+                      'arepa_docs','arepa_evm','arepa_config','miroUrl'];
+          let restored=0;
+          keys.forEach(k=>{ if(data[k]){ localStorage.setItem(k,data[k]); restored++; } });
+          this.importMsg='✓ Respaldo restaurado ('+restored+' módulos). Recarga la página para ver los datos.';
+          this.importOk=true;
+          this.lastBackup=data._fecha;
+        }catch(err){
+          this.importMsg='✗ Error al leer el archivo: '+err.message;
+          this.importOk=false;
+        }
+      };
+      reader.readAsText(file);
+      ev.target.value='';
+    },
     saveComms(){ localStorage.setItem('arepa_comms',JSON.stringify(this.comms)); },
     loadComms(){ const s=localStorage.getItem('arepa_comms'); if(s)this.comms=JSON.parse(s); },
     saveChanges(){ localStorage.setItem('arepa_changes',JSON.stringify(this.changes)); },

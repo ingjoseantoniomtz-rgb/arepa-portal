@@ -1045,7 +1045,11 @@ function app(){
     lightboxUrl:null,
     photoTarget:null,
     designRequests:[],
-    changes:[],
+    changes:[
+      {id:1,date:'20 jun 2026',
+       desc:'Reparar acabados en bardas perimetrales traseras. Estas reparaciones se pueden hacer antes o después de terminar la etapa de construcción. Se pretende cubrir su costo con posibles ahorros en estructuras de concreto, demoliciones y rellenos. Depende del presupuesto final de obra.',
+       costImpact:'$0',timeImpact:'+3 días',status:'Solicitado'},
+    ],
     newComm:{type:'issue',text:''},
     newDesign:{element:'Piso / Acabados',desc:''},
     currentVersion:'1.1',
@@ -1056,8 +1060,9 @@ function app(){
       const gs=new Date('2026-06-18T12:00:00');
       this.todayPct=Math.min(100,Math.max(0,(new Date()-gs)/86400000/64*100));
       this.loadGantt(); this.loadQualityPhotos();
-      // sync changes from PM localStorage if available
+      // sync data from PM portal if available, otherwise use preloaded defaults
       const ch=localStorage.getItem('arepa_changes'); if(ch)try{this.changes=JSON.parse(ch)}catch(e){}
+      const cm=localStorage.getItem('arepa_comms'); if(cm)try{this.comms=JSON.parse(cm)}catch(e){}
       const kp=localStorage.getItem('arepa_kpi'); if(kp)try{this.kpi=Object.assign(this.kpi,JSON.parse(kp))}catch(e){}
     },
 
@@ -1398,8 +1403,12 @@ function app(){
     ],
 
     comms:[
-      {id:1,from:'JAM',date:'18 Jun 2026 · 14:30',type:'update',text:'Proyecto iniciado formalmente. Contrato firmado, Pago 1 recibido ($24,222.37). Comenzamos levantamiento arquitectónico. Portal digital activo. ¡Bienvenida, Graciela!',read:true},
-      {id:2,from:'JAM',date:'20 Jun 2026 · 09:15',type:'update',text:'Portal actualizado a v1.1 — ahora incluye desglose de alcance por capítulos, Gantt expandible, costos por volumen, semáforo de calidad y control de versiones.',read:false},
+      {id:3,from:'JAM',date:'23 jun 2026 · 08:13 a.m.',type:'decision',
+       text:'La clienta ha solicitado iniciar las obras hasta el día 27 de julio de 2026.',read:true},
+      {id:1,from:'JAM',date:'18 Jun 2026 · 14:30',type:'update',
+       text:'Proyecto iniciado formalmente. Contrato firmado, Pago 1 recibido ($24,222.37). Comenzamos levantamiento arquitectónico. Portales activos.',read:true},
+      {id:2,from:'JAM',date:'19 Jun 2026 · 09:15',type:'update',
+       text:'Inicio de levantamiento arquitectónico. Ingenierías en proceso.',read:true},
     ],
 
     docs:[
