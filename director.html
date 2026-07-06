@@ -328,7 +328,7 @@ input[type=date]{color:var(--text)}
         <div class="kpi-grid">
           <div class="kpi-card pink"><div class="kpi-label">Avance General</div><div class="kpi-value" x-text="kpi.avance+'%'"></div><div class="kpi-sub">Meta semana 1: 8%</div><div class="progress-bar"><div class="progress-fill fill-pink" :style="'width:'+kpi.avance+'%'"></div></div></div>
           <div class="kpi-card cyan"><div class="kpi-label">Pagado a la fecha</div><div class="kpi-value" x-text="'$'+fmtN(kpi.pagado)"></div><div class="kpi-sub" x-text="'de $293,525 · '+Math.round(kpi.pagado/293525*100)+'%'"></div></div>
-          <div class="kpi-card purple"><div class="kpi-label">Días transcurridos</div><div class="kpi-value" x-text="daysSinceStart()"></div><div class="kpi-sub">de 64 días totales</div></div>
+          <div class="kpi-card purple"><div class="kpi-label">Días transcurridos</div><div class="kpi-value" x-text="daysSinceStart()"></div><div class="kpi-sub">de 196 días totales</div></div>
           <div class="kpi-card green"><div class="kpi-label">SPI</div><div class="kpi-value" x-text="kpi.spi"></div><div class="kpi-sub" x-text="kpi.spi>=1?'Adelantado o puntual':'Atraso en cronograma'"></div></div>
           <div class="kpi-card amber"><div class="kpi-label">CPI</div><div class="kpi-value" x-text="kpi.cpi"></div><div class="kpi-sub" x-text="kpi.cpi>=1?'En presupuesto':'Sobrecosto'"></div></div>
           <div class="kpi-card dark"><div class="kpi-label">Riesgos Activos</div><div class="kpi-value" x-text="risks.filter(r=>r.status==='activo').length"></div><div class="kpi-sub" x-text="risks.filter(r=>r.nivel==='alto'&&r.status==='activo').length+' de nivel alto'"></div></div>
@@ -462,7 +462,7 @@ input[type=date]{color:var(--text)}
               </table>
             </div>
             <div style="display:flex;justify-content:space-between;padding:.5rem 1rem;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border)">
-              <span>◀ 18 Jun 2026</span><span>64 días · Ruta crítica: 2→6→7→8→10→11→13→15</span><span>21 Ago 2026 ▶</span>
+              <span>◀ 18 Jun 2026</span><span>196 días · Ruta crítica: 2→6→7→8→10→11→13→15</span><span>31 Dic 2026 ▶</span>
             </div>
           </div>
         </div>
@@ -501,17 +501,72 @@ input[type=date]{color:var(--text)}
             </div>
           </div>
           <div class="card span2">
-            <div class="card-header"><div class="card-title">EDT — Estructura de Desglose de Trabajo</div></div>
-            <div class="card-body" style="font-size:.83rem;line-height:1.75">
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem">
-                <template x-for="wbs in wbsItems" :key="wbs.code">
-                  <div style="padding:.8rem;background:var(--light);border-radius:.65rem;border-left:3px solid" :style="'border-color:'+wbs.color">
-                    <div style="font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:.2rem" x-text="wbs.code"></div>
-                    <div style="font-weight:600;font-size:.83rem" x-text="wbs.name"></div>
-                    <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" x-text="wbs.desc"></div>
-                  </div>
-                </template>
+            <div class="card-header">
+              <div class="card-title">📋 Alcance — Control por Concepto</div>
+              <div style="display:flex;align-items:center;gap:.6rem">
+                <span style="font-size:.78rem;font-weight:700;color:var(--green)" x-text="totalScopePct()+'% avance general'"></span>
+                <button class="btn btn-ghost btn-sm" @click="scopeExpandAll(true)">▼ Expandir</button>
+                <button class="btn btn-ghost btn-sm" @click="scopeExpandAll(false)">▶ Colapsar</button>
               </div>
+            </div>
+            <div style="padding:.5rem 1.25rem .25rem">
+              <div style="background:var(--border);border-radius:4px;height:8px">
+                <div style="height:8px;border-radius:4px;background:var(--green);transition:width .4s" :style="'width:'+totalScopePct()+'%'"></div>
+              </div>
+            </div>
+            <div class="card-body" style="padding-top:.5rem">
+              <template x-for="ch in scopeChapters" :key="ch.id">
+                <div style="margin-bottom:.5rem;border:1px solid var(--border);border-radius:.65rem;overflow:hidden">
+                  <div @click="ch.open=!ch.open" style="cursor:pointer;padding:.6rem 1rem;display:flex;align-items:center;gap:.65rem;border-left:4px solid" :style="'border-left-color:'+ch.color+';background:var(--light)'">
+                    <span x-text="ch.open?'▼':'▶'" style="font-size:.68rem;color:var(--muted);width:10px;flex-shrink:0"></span>
+                    <span style="font-size:.72rem;font-weight:800;color:var(--muted);width:16px;flex-shrink:0" x-text="ch.id"></span>
+                    <span style="font-weight:600;font-size:.82rem;flex:1" x-text="ch.name"></span>
+                    <div style="width:90px;background:var(--border);border-radius:3px;height:6px;flex-shrink:0">
+                      <div style="height:6px;border-radius:3px;transition:width .3s" :style="'width:'+scopeChPct(ch)+'%;background:'+ch.color"></div>
+                    </div>
+                    <span style="font-size:.75rem;font-weight:700;width:36px;text-align:right;flex-shrink:0" x-text="scopeChPct(ch)+'%'"></span>
+                  </div>
+                  <div x-show="ch.open">
+                    <div class="table-wrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th style="font-size:.68rem">ID</th>
+                            <th style="font-size:.68rem">Descripción</th>
+                            <th style="font-size:.68rem;text-align:center">U.</th>
+                            <th style="font-size:.68rem;text-align:right">Cant.</th>
+                            <th style="font-size:.68rem;text-align:center;width:130px">Estado</th>
+                            <th style="font-size:.68rem;text-align:center;width:90px">% Avance</th>
+                            <th style="font-size:.68rem;min-width:130px">Notas</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <template x-for="c in ch.concepts" :key="c.id">
+                            <tr>
+                              <td style="font-weight:700;color:var(--muted);font-size:.72rem" x-text="c.id"></td>
+                              <td style="font-size:.75rem" x-text="c.desc"></td>
+                              <td style="text-align:center;color:var(--muted);font-size:.72rem" x-text="c.unit"></td>
+                              <td style="text-align:right;font-size:.72rem" x-text="c.qty"></td>
+                              <td style="text-align:center">
+                                <select x-model="getScopeItem(c.id).status" @change="saveScopeProgress()" style="font-size:.7rem;padding:.2rem .3rem;border-radius:.35rem;width:100%">
+                                  <option>Pendiente</option><option>En proceso</option><option>Terminado</option><option>Con observación</option>
+                                </select>
+                              </td>
+                              <td style="text-align:center">
+                                <div style="display:flex;align-items:center;gap:.25rem;justify-content:center">
+                                  <input type="number" min="0" max="100" x-model="getScopeItem(c.id).pct" @change="saveScopeProgress()" style="width:46px;font-size:.72rem;padding:.2rem .3rem;text-align:center">
+                                  <span style="font-size:.7rem;color:var(--muted)">%</span>
+                                </div>
+                              </td>
+                              <td><input type="text" x-model="getScopeItem(c.id).note" @change="saveScopeProgress()" placeholder="—" style="width:100%;font-size:.72rem;padding:.2rem .35rem"></td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -1014,6 +1069,7 @@ function app(){
     showStakeholderModal:false, showDocModal:false, showMilestoneModal:false,
     miroUrl: localStorage.getItem('miroUrl')||'',
     lastBackup: localStorage.getItem('arepa_lastBackup')||'',
+    scopeProgress: [],
     importMsg:'', importOk:true,
     ganttSaved:false, clientPin: CLIENT_PIN_DISPLAY,
     todayPct:0,
@@ -1028,10 +1084,11 @@ function app(){
     init(){
       if(sessionStorage.getItem('arepa_pm_auth')==='1') this.unlocked=true;
       const gs=new Date('2026-06-18T12:00:00');
-      this.todayPct=Math.min(100,Math.max(0,(new Date()-gs)/86400000/64*100));
+      this.todayPct=Math.min(100,Math.max(0,(new Date()-gs)/86400000/196*100));
       this.loadGantt(); this.loadKpi(); this.loadEvm(); this.loadRisks();
       this.loadPayments(); this.loadQuality(); this.loadComms();
       this.loadChanges(); this.loadDocs(); this.loadStakeholders(); this.loadConfig();
+      this.loadScopeProgress();
     },
     checkPin(){
       if(this.pinInput===PM_PIN){ this.unlocked=true; sessionStorage.setItem('arepa_pm_auth','1'); }
@@ -1078,7 +1135,7 @@ function app(){
     exportarRespaldo(){
       const keys=['arepa_gantt','arepa_kpi','arepa_payments','arepa_changes',
                   'arepa_risks','arepa_quality','arepa_comms','arepa_stakeholders',
-                  'arepa_docs','arepa_evm','arepa_config','miroUrl'];
+                  'arepa_docs','arepa_evm','arepa_config','arepa_scope','miroUrl'];
       const data={_fecha:new Date().toLocaleString('es-MX'),_proyecto:'A-RE-PA'};
       keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) data[k]=v; });
       const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -1199,6 +1256,29 @@ function app(){
     removeDoc(id){ if(confirm('¿Eliminar documento?')){ this.documents=this.documents.filter(d=>d.id!==id); this.saveDocs(); } },
     toggleMilestone(m){ m.status=m.status==='done'?'pending':'done'; },
     saveMiro(){ localStorage.setItem('miroUrl',this.miroUrl); this.showMiroModal=false; },
+    getScopeItem(id){ return this.scopeProgress.find(x=>x.id===id)||{pct:0,status:'Pendiente',note:''}; },
+    saveScopeProgress(){ localStorage.setItem('arepa_scope',JSON.stringify(this.scopeProgress)); },
+    loadScopeProgress(){
+      const s=localStorage.getItem('arepa_scope');
+      if(s) this.scopeProgress=JSON.parse(s);
+      this.scopeChapters.forEach(ch=>{
+        ch.concepts.forEach(c=>{
+          if(!this.scopeProgress.find(x=>x.id===c.id))
+            this.scopeProgress.push({id:c.id,pct:0,status:'Pendiente',note:''});
+        });
+      });
+    },
+    scopeChPct(ch){
+      const items=ch.concepts.map(c=>this.getScopeItem(c.id));
+      if(!items.length)return 0;
+      return Math.round(items.reduce((a,x)=>a+Number(x.pct||0),0)/items.length);
+    },
+    totalScopePct(){
+      let tw=0,ws=0;
+      this.scopeChapters.forEach(ch=>{ const p=this.scopeChPct(ch); ws+=p*(ch.subtotal||1); tw+=(ch.subtotal||1); });
+      return tw>0?Math.round(ws/tw):0;
+    },
+    scopeExpandAll(v){ this.scopeChapters.forEach(ch=>ch.open=v); },
 
     // ── DATA ─────────────────────────────────────────
     kpi:{ avance:8, pagado:24222.37, spi:'1.00', cpi:'1.00', nota:'' },
@@ -1209,7 +1289,7 @@ function app(){
       {id:3,date:'03 Jul 2026',title:'Entrega Proyecto Ejecutivo',sub:'Planos + memorias',status:'pending'},
       {id:4,date:'10 Jul 2026',title:'Aprobación + Pago 2 Anticipo',sub:'$107,720.98',status:'pending'},
       {id:5,date:'13 Jul 2026',title:'Inicio Obra Civil',sub:'Movilización + trazo',status:'pending'},
-      {id:6,date:'21 Ago 2026',title:'Entrega Formal',sub:'Acta + Pago 8 Final',status:'pending'},
+      {id:6,date:'04 Sep 2026',title:'Entrega Formal',sub:'Acta + Pago 8 Final',status:'pending'},
     ],
     ganttTasks:[
       {id:1,name:'Levantamiento arquitectónico',startDay:0,dur:3,pred:'-',critical:false,color:'#9B5FD4',status:'En proceso',s0:'18 Jun',e0:'20 Jun',rescheduled:null},
@@ -1283,17 +1363,74 @@ function app(){
       {id:4,name:'H. Ayuntamiento Torreón',role:'Autoridad Municipal',company:'DUOT',contact:'www.torreon.gob.mx',influencia:'Alta',interes:'Bajo'},
       {id:5,name:'Subcontratista de Obra Civil',role:'Contratista',company:'Por adjudicar',contact:'—',influencia:'Media',interes:'Alto'},
     ],
-    wbsItems:[
-      {code:'1.0',name:'Gestión del Proyecto',desc:'PM, contratos, portal digital',color:'var(--dark)'},
-      {code:'1.1',name:'Proyecto Ejecutivo',desc:'Arquitectónico + ingenierías',color:'var(--purple)'},
-      {code:'1.2',name:'Permisos y Licencias',desc:'DUOT, dictámenes',color:'#6d28d9'},
-      {code:'1.3',name:'Adecuaciones Preliminares',desc:'Registros, boiler, accesos',color:'var(--pink)'},
-      {code:'1.4',name:'Cimentación y Estructura',desc:'Excavación, concreto, acero',color:'var(--pink)'},
-      {code:'1.5',name:'Albañilería y Cubierta',desc:'Muros, losa, mampostería',color:'#e11d48'},
-      {code:'1.6',name:'Instalaciones',desc:'Hidr., san., eléc.',color:'var(--cyan)'},
-      {code:'1.7',name:'Acabados',desc:'Pisos, pintura, impermeab.',color:'var(--amber)'},
-      {code:'1.8',name:'Carpintería y Herrería',desc:'Puertas, cancelería',color:'#be185d'},
-      {code:'1.9',name:'Entrega',desc:'Limpieza, acta, cierre',color:'var(--green)'},
+    scopeChapters:[
+      {id:'PE',name:'Proyecto Ejecutivo e Ingenierías',color:'#6d28d9',subtotal:24222.37,open:false,concepts:[
+        {id:'PE-01',desc:'Estudio de mecánica de suelos — sondeos superficiales a cielo abierto',unit:'Sondeo',qty:1},
+        {id:'PE-02',desc:'Elaboración de Proyecto Arquitectónico (<500m²): plantas, fachadas y detalles',unit:'m²',qty:37},
+        {id:'PE-03',desc:'Elaboración de Proyecto Estructural (<500m²): memoria de cálculo y planos',unit:'m²',qty:37},
+        {id:'PE-04',desc:'Elaboración de Proyecto Hidráulico-Sanitario (<500m²): memoria, planos e isométricos',unit:'m²',qty:37},
+        {id:'PE-05',desc:'Elaboración de Proyecto Eléctrico (<500m²): memoria, planos y diagramas unifilares',unit:'m²',qty:37},
+      ]},
+      {id:'A',name:'Obras Preliminares',color:'#FF3EA5',subtotal:10150,open:false,concepts:[
+        {id:'A-01',desc:'Trazo y nivelación de áreas de trabajo',unit:'m²',qty:37},
+        {id:'A-02',desc:'Demolición selectiva de muros y acabados',unit:'m²',qty:13.5},
+        {id:'A-03',desc:'Acarreo y desalojo de escombro',unit:'viaje',qty:4},
+      ]},
+      {id:'B',name:'Cimentación y Estructura',color:'#9B5FD4',subtotal:72800,open:false,concepts:[
+        {id:'B-01',desc:'Excavación de cepas y nivelación',unit:'m³',qty:8.4},
+        {id:'B-02',desc:'Plantilla de concreto simple fc=100 kg/cm²',unit:'m²',qty:24},
+        {id:'B-03',desc:'Zapatas corridas concreto armado fc=200',unit:'m³',qty:3.2},
+        {id:'B-04',desc:'Trabes de liga 20×40 cm',unit:'m',qty:18},
+        {id:'B-05',desc:'Columnas 20×20 cm',unit:'m',qty:24},
+        {id:'B-06',desc:'Losa maciza e=12 cm fc=200 kg/cm²',unit:'m²',qty:24},
+        {id:'B-07',desc:'Acero de refuerzo fy=4200 (complemento)',unit:'kg',qty:1},
+      ]},
+      {id:'C',name:'Mampostería e Interiores',color:'#00C8D7',subtotal:45200,open:false,concepts:[
+        {id:'C-01',desc:'Muro de tabicón rojo recocido',unit:'m²',qty:48},
+        {id:'C-02',desc:'Castillos de concreto armado 15×15 cm',unit:'m',qty:32},
+        {id:'C-03',desc:'Dalas de cierre 20×20 cm',unit:'m',qty:24},
+        {id:'C-04',desc:'Aplanado de yeso interiores',unit:'m²',qty:86},
+        {id:'C-05',desc:'Aplanado de mortero exteriores',unit:'m²',qty:38},
+      ]},
+      {id:'D',name:'Instalación Hidráulica-Sanitaria',color:'#FF3EA5',subtotal:22300,open:false,concepts:[
+        {id:'D-01',desc:'Alimentación agua fría CPVC 3/4"',unit:'m',qty:14},
+        {id:'D-02',desc:'Red de distribución CPVC 1/2"',unit:'m',qty:22},
+        {id:'D-03',desc:'Drenaje sanitario PVC 4"',unit:'m',qty:18},
+        {id:'D-04',desc:'WC de piso con fluxómetro',unit:'pza',qty:1},
+        {id:'D-05',desc:'Lavabo con mezcladora',unit:'pza',qty:1},
+      ]},
+      {id:'E',name:'Instalación Eléctrica',color:'#9B5FD4',subtotal:18800,open:false,concepts:[
+        {id:'E-01',desc:'Tablero eléctrico 8 circuitos',unit:'pza',qty:1},
+        {id:'E-02',desc:'Circuitos de iluminación calibre 12 AWG',unit:'circ.',qty:4},
+        {id:'E-03',desc:'Circuitos de contactos calibre 12 AWG',unit:'circ.',qty:3},
+        {id:'E-04',desc:'Contactos, apagadores y luminarias LED',unit:'pza',qty:12},
+      ]},
+      {id:'F',name:'Remodelación Área Existente (13 m²)',color:'#00C8D7',subtotal:12000,open:false,concepts:[
+        {id:'F-01',desc:'Demolición y retiro de acabados',unit:'m²',qty:13},
+        {id:'F-02',desc:'Aplanado fino de yeso',unit:'m²',qty:55},
+        {id:'F-03',desc:'Reparación de losa e impermeabilización',unit:'m²',qty:13},
+      ]},
+      {id:'G',name:'Pisos ★',color:'#FF3EA5',subtotal:29419.01,open:false,concepts:[
+        {id:'G-01',desc:'Porcelanato 60×60 cm primera calidad',unit:'m²',qty:46.77},
+      ]},
+      {id:'H',name:'Impermeabilización ★',color:'#9B5FD4',subtotal:607.2,open:false,concepts:[
+        {id:'H-01',desc:'Impermeabilizante elastomérico en cubiertas',unit:'Global',qty:1},
+      ]},
+      {id:'I',name:'Pintura ★',color:'#00C8D7',subtotal:15656.11,open:false,concepts:[
+        {id:'I-01',desc:'Pintura vinílica muros interiores',unit:'m²',qty:74},
+        {id:'I-02',desc:'Pintura vinílica cielos',unit:'m²',qty:19},
+        {id:'I-03',desc:'Complemento pintura (detalles y remates)',unit:'Global',qty:1},
+      ]},
+      {id:'J',name:'Carpintería y Herrería',color:'#FF3EA5',subtotal:11788.08,open:false,concepts:[
+        {id:'J-01',desc:'Puerta principal herrería forjada',unit:'pza',qty:1},
+        {id:'J-02',desc:'Puertas interiores de madera (2 hojas)',unit:'pza',qty:2},
+        {id:'J-03',desc:'Ventana aluminio con cristal 4 mm',unit:'m²',qty:4.8},
+        {id:'J-04',desc:'Protección de herrería fija en ventanas',unit:'m²',qty:2.4},
+      ]},
+      {id:'K',name:'Limpieza Final y Entrega',color:'#9B5FD4',subtotal:6100,open:false,concepts:[
+        {id:'K-01',desc:'Limpieza general del inmueble',unit:'Global',qty:1},
+        {id:'K-02',desc:'Entrega formal con pruebas operativas',unit:'Global',qty:1},
+      ]},
     ],
   }
 }
