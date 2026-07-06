@@ -140,7 +140,7 @@ tr:hover td{background:var(--light)}
   background-size:21.875% 100%;background-repeat:repeat-x;
 }
 .gantt-wk-hdr{display:flex;height:30px;position:relative}
-.gantt-wk-lbl{flex:0 0 10.9375%;font-size:.6rem;font-weight:700;color:var(--muted);padding-left:.3rem;display:flex;align-items:center;border-left:1px solid var(--border)}
+.gantt-wk-lbl{flex:0 0 7.14%;font-size:.6rem;font-weight:700;color:var(--muted);padding-left:.3rem;display:flex;align-items:center;border-left:1px solid var(--border)}
 .gantt-wk-lbl:first-child{border-left:none}
 .gantt-wk-lbl:last-child{flex:1}
 .gantt-bar-pro{position:absolute;height:16px;top:50%;transform:translateY(-50%);border-radius:3px;display:flex;align-items:center;padding:0 .35rem;overflow:hidden;white-space:nowrap;min-width:3px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
@@ -401,15 +401,20 @@ input[type=date]{color:var(--text)}
                     <th class="gpt-chart-th">
                       <div class="gantt-wk-hdr">
                         <div class="gantt-wk-lbl">18 Jun</div>
-                        <div class="gantt-wk-lbl">25 Jun</div>
                         <div class="gantt-wk-lbl">02 Jul</div>
-                        <div class="gantt-wk-lbl">09 Jul</div>
                         <div class="gantt-wk-lbl">16 Jul</div>
-                        <div class="gantt-wk-lbl">23 Jul</div>
                         <div class="gantt-wk-lbl">30 Jul</div>
-                        <div class="gantt-wk-lbl">06 Ago</div>
                         <div class="gantt-wk-lbl">13 Ago</div>
-                        <div class="gantt-wk-lbl">20 Ago</div>
+                        <div class="gantt-wk-lbl">27 Ago</div>
+                        <div class="gantt-wk-lbl">10 Sep</div>
+                        <div class="gantt-wk-lbl">24 Sep</div>
+                        <div class="gantt-wk-lbl">08 Oct</div>
+                        <div class="gantt-wk-lbl">22 Oct</div>
+                        <div class="gantt-wk-lbl">05 Nov</div>
+                        <div class="gantt-wk-lbl">19 Nov</div>
+                        <div class="gantt-wk-lbl">03 Dic</div>
+                        <div class="gantt-wk-lbl">17 Dic</div>
+                        <div class="gantt-wk-lbl">31 Dic</div>
                         <div class="today-v" :style="'left:'+todayPct+'%'" x-show="todayPct>0&&todayPct<100">
                           <div class="today-hdr-lbl">HOY</div>
                         </div>
@@ -438,7 +443,7 @@ input[type=date]{color:var(--text)}
                       </td>
                       <td class="gpt-resch">
                         <div style="display:flex;align-items:center;gap:.3rem">
-                          <input type="date" x-model="t.rescheduled" style="font-size:.7rem;padding:.2rem .3rem;width:100px" @change="saveGantt()" :min="'2026-06-18'" :max="'2026-08-30'">
+                          <input type="date" x-model="t.rescheduled" style="font-size:.7rem;padding:.2rem .3rem;width:100px" @change="saveGantt()" :min="'2026-06-18'" :max="'2026-12-31'">
                           <button x-show="t.rescheduled" @click="t.rescheduled=null;saveGantt()" class="btn btn-ghost" style="padding:.1rem .25rem;font-size:.65rem;color:var(--muted)">✕</button>
                         </div>
                       </td>
@@ -738,6 +743,17 @@ input[type=date]{color:var(--text)}
                   <option>firmado</option><option>vigente</option><option>en trámite</option><option>pendiente</option>
                 </select>
               </div>
+              <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+                <template x-if="doc.fileData">
+                  <button class="btn btn-cyan btn-sm" style="font-size:.68rem" @click="downloadDoc(doc)">⬇ Descargar</button>
+                </template>
+                <template x-if="!doc.fileData && doc.url">
+                  <a :href="doc.url" target="_blank" class="btn btn-outline btn-sm" style="font-size:.68rem;text-decoration:none">↗ Abrir link</a>
+                </template>
+                <template x-if="!doc.fileData && !doc.url">
+                  <span style="font-size:.68rem;color:var(--muted);font-style:italic">Sin archivo</span>
+                </template>
+              </div>
             </div>
           </template>
         </div>
@@ -969,7 +985,17 @@ input[type=date]{color:var(--text)}
         <div class="form-group"><label>Fecha</label><input type="date" x-model="newDoc.dateRaw"></div>
         <div class="form-group"><label>Icono (emoji)</label><input type="text" x-model="newDoc.icon" maxlength="2"></div>
       </div>
-      <div class="form-group"><label>URL del documento (opcional)</label><input type="url" x-model="newDoc.url" placeholder="https://..."></div>
+      <div class="form-group">
+        <label>📎 Subir archivo <span style="font-weight:400;color:var(--muted)">(PDF, DWG, DXF — máx. 3 MB)</span></label>
+        <input type="file" accept=".pdf,.dwg,.dxf,.xlsx,.docx,.jpg,.png,.zip" x-ref="docFileInput" @change="handleDocFile($event)" style="font-size:.82rem">
+        <div x-show="newDoc.fileName" style="margin-top:.3rem;font-size:.75rem;color:var(--green)">✓ <span x-text="newDoc.fileName"></span></div>
+        <div x-show="newDoc.fileError" style="margin-top:.3rem;font-size:.75rem;color:var(--red)" x-text="newDoc.fileError"></div>
+      </div>
+      <div class="form-group">
+        <label>🔗 O pega un link externo <span style="font-weight:400;color:var(--muted)">(Google Drive, OneDrive, Dropbox)</span></label>
+        <input type="url" x-model="newDoc.url" placeholder="https://drive.google.com/...">
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">Si subes un archivo Y un link, se usará el archivo subido.</div>
+      </div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" @click="showDocModal=false">Cancelar</button><button class="btn btn-primary" @click="addDoc()">Agregar</button></div>
   </div>
@@ -996,7 +1022,7 @@ function app(){
     newRisk:{desc:'',prob:'media',impacto:'medio',nivel:'medio',plan:''},
     newChange:{desc:'',costImpact:'',timeImpact:''},
     newStakeholder:{name:'',role:'',company:'',contact:'',influencia:'Media',interes:'Medio'},
-    newDoc:{name:'',type:'legal',dateRaw:'',icon:'📄',url:''},
+    newDoc:{name:'',type:'legal',dateRaw:'',icon:'📄',url:'',fileData:'',fileName:'',fileSize:'',fileError:''},
     config:{projectName:'A-RE-PA',client:'Graciela Gutiérrez Ortega',startDate:'2026-06-18',endDate:'2026-08-21',internalNote:''},
 
     init(){
@@ -1022,14 +1048,14 @@ function app(){
 
     gBarStyle(t){
       const sd=t.rescheduled?this.dayFromStr(t.rescheduled):t.startDay;
-      const l=(sd/64*100).toFixed(3); const w=Math.max(.5,t.dur/64*100).toFixed(3);
+      const l=(sd/196*100).toFixed(3); const w=Math.max(.5,t.dur/196*100).toFixed(3);
       return `left:${l}%;width:${w}%`;
     },
     gOrigStyle(t){
-      const l=(t.startDay/64*100).toFixed(3); const w=(t.dur/64*100).toFixed(3);
+      const l=(t.startDay/196*100).toFixed(3); const w=(t.dur/196*100).toFixed(3);
       return `left:${l}%;width:${w}%`;
     },
-    dayFromStr(ds){ const s=new Date('2026-06-18T12:00:00'); const d=new Date(ds+'T12:00:00'); return Math.max(0,Math.min(64,Math.floor((d-s)/86400000))); },
+    dayFromStr(ds){ const s=new Date('2026-06-18T12:00:00'); const d=new Date(ds+'T12:00:00'); return Math.max(0,Math.min(196,Math.floor((d-s)/86400000))); },
     fmtDay(ds){ if(!ds)return''; return new Date(ds+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'}); },
     showSaved(){ this.ganttSaved=true; setTimeout(()=>this.ganttSaved=false,3000); },
     resetGantt(){ if(confirm('¿Borrar todas las reprogramaciones?')){ this.ganttTasks.forEach(t=>t.rescheduled=null); this.saveGantt(); } },
@@ -1136,12 +1162,39 @@ function app(){
       this.newStakeholder={name:'',role:'',company:'',contact:'',influencia:'Media',interes:'Medio'}; this.showStakeholderModal=false;
     },
     removeStakeholder(id){ if(confirm('¿Eliminar involucrado?')){ this.stakeholders=this.stakeholders.filter(s=>s.id!==id); localStorage.setItem('arepa_stakeholders',JSON.stringify(this.stakeholders)); } },
+    handleDocFile(ev){
+      const file=ev.target.files[0];
+      if(!file){ this.newDoc.fileName=''; this.newDoc.fileData=''; return; }
+      if(file.size>3*1024*1024){
+        this.newDoc.fileError='Archivo demasiado grande (máx. 3 MB). Usa un link externo.';
+        this.newDoc.fileName=''; this.newDoc.fileData=''; ev.target.value=''; return;
+      }
+      this.newDoc.fileError='';
+      const reader=new FileReader();
+      reader.onload=(e)=>{
+        this.newDoc.fileData=e.target.result;
+        this.newDoc.fileName=file.name;
+        this.newDoc.fileSize=(file.size/1024).toFixed(0)+' KB';
+      };
+      reader.readAsDataURL(file);
+    },
+    downloadDoc(doc){
+      if(!doc.fileData) return;
+      const a=document.createElement('a');
+      a.href=doc.fileData;
+      a.download=doc.fileName||doc.name;
+      a.click();
+    },
     addDoc(){
       if(!this.newDoc.name.trim())return;
       const dtl=this.typeLabel(this.newDoc.type);
       const dateStr=this.newDoc.dateRaw?new Date(this.newDoc.dateRaw+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
-      this.documents.push({id:Date.now(),...this.newDoc,date:dateStr,size:'—',status:'pendiente',typeLabel:dtl});
-      this.saveDocs(); this.newDoc={name:'',type:'legal',dateRaw:'',icon:'📄',url:''}; this.showDocModal=false;
+      const size=this.newDoc.fileSize||'—';
+      this.documents.push({id:Date.now(),...this.newDoc,date:dateStr,size,status:'pendiente',typeLabel:dtl});
+      this.saveDocs();
+      this.newDoc={name:'',type:'legal',dateRaw:'',icon:'📄',url:'',fileData:'',fileName:'',fileSize:'',fileError:''};
+      if(this.$refs.docFileInput) this.$refs.docFileInput.value='';
+      this.showDocModal=false;
     },
     removeDoc(id){ if(confirm('¿Eliminar documento?')){ this.documents=this.documents.filter(d=>d.id!==id); this.saveDocs(); } },
     toggleMilestone(m){ m.status=m.status==='done'?'pending':'done'; },
