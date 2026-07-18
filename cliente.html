@@ -301,6 +301,7 @@ textarea{resize:vertical;min-height:70px}
       <div class="nav-item" :class="{active:tab==='scope'}" @click="nav('scope')"><span class="nav-icon">📋</span>Alcance</div>
       <div class="nav-item" :class="{active:tab==='schedule'}" @click="nav('schedule')"><span class="nav-icon">📅</span>Cronograma</div>
       <div class="nav-item" :class="{active:tab==='cost'}" @click="nav('cost')"><span class="nav-icon">💰</span>Costos</div>
+      <div class="nav-item" :class="{active:tab==='oc'}" @click="nav('oc')"><span class="nav-icon">📝</span>Órdenes de Cambio</div>
       <div class="nav-item" :class="{active:tab==='risk'}" @click="nav('risk')"><span class="nav-icon">⚠️</span>Riesgos</div>
       <div class="nav-item" :class="{active:tab==='quality'}" @click="nav('quality')"><span class="nav-icon">✅</span>Calidad</div>
       <div class="nav-item" :class="{active:tab==='comms'}" @click="nav('comms')">
@@ -340,7 +341,7 @@ textarea{resize:vertical;min-height:70px}
             <p>Ampliación + Remodelación Recámara · Torreón, Coahuila</p>
           </div>
           <div class="chips">
-            <span class="chip chip-green">✓ Ingenierías Activas</span>
+            <span class="chip chip-green">✓ Ingenierías Completadas</span>
             <span class="chip chip-cyan">Portal v<span x-text="currentVersion"></span></span>
             <span class="chip chip-pink">Pago 1 Confirmado</span>
           </div>
@@ -356,7 +357,7 @@ textarea{resize:vertical;min-height:70px}
           <div class="kpi c-pink">
             <div class="kpi-label">Inversión Realizada</div>
             <div class="kpi-value">$24,222</div>
-            <div class="kpi-sub">de $293,525 total · 8.2%</div>
+            <div class="kpi-sub">de $272,215 vigente · 8.9%</div>
           </div>
           <div class="kpi c-purple">
             <div class="kpi-label">Días Transcurridos</div>
@@ -366,7 +367,7 @@ textarea{resize:vertical;min-height:70px}
           <div class="kpi c-green">
             <div class="kpi-label">Pagos Completados</div>
             <div class="kpi-value">1 / 8</div>
-            <div class="kpi-sub">Próximo: $107,721 · 10 Jul</div>
+            <div class="kpi-sub">Próximo: $99,197 · 28 Jul</div>
           </div>
         </div>
 
@@ -391,11 +392,11 @@ textarea{resize:vertical;min-height:70px}
           <div class="card">
             <div class="card-header"><div class="card-title">Próximo Pago</div></div>
             <div class="card-body" style="text-align:center">
-              <div style="font-size:2rem;font-weight:800;color:var(--dark);margin-bottom:.4rem">$107,720.98</div>
+              <div style="font-size:2rem;font-weight:800;color:var(--dark);margin-bottom:.4rem">$99,197.08</div>
               <div style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem">Anticipo de Obra Civil (40%)</div>
-              <span class="badge bg-amber">Vence: 10/07/2026</span>
+              <span class="badge bg-amber">Vence: 28/07/2026</span>
               <div style="margin-top:1rem;padding:.85rem;background:var(--light);border-radius:.65rem;font-size:.78rem;color:var(--muted);text-align:left;line-height:1.6">
-                Exigible al obtener licencia municipal y aprobación del presupuesto final.
+                Exigible al inicio de la Fase 2 — Construcción (28 Jul 2026).
               </div>
             </div>
           </div>
@@ -618,10 +619,10 @@ textarea{resize:vertical;min-height:70px}
       <!-- ═══ COSTOS ═══ -->
       <div x-show="tab==='cost'">
         <div class="kpi-grid">
-          <div class="kpi c-dark"><div class="kpi-label">Contrato Original</div><div class="kpi-value">$293,525</div><div class="kpi-sub">A-RE-PA-2026-001</div></div>
-          <div class="kpi c-green"><div class="kpi-label">Pagado</div><div class="kpi-value">$24,222</div><div class="kpi-sub">Pago 1 — Ingenierías</div></div>
-          <div class="kpi c-amber"><div class="kpi-label">Saldo Pendiente</div><div class="kpi-value">$269,302</div><div class="kpi-sub">Obra civil restante</div></div>
-          <div class="kpi c-cyan"><div class="kpi-label">Cambios de Costo</div><div class="kpi-value" x-text="'$'+fmtN(costChangesTotal())"></div><div class="kpi-sub">Modificaciones autorizadas</div></div>
+          <div class="kpi c-dark"><div class="kpi-label">Presupuesto Original</div><div class="kpi-value">$363,204</div><div class="kpi-sub">A-RE-PA-2026-001</div></div>
+          <div class="kpi c-pink"><div class="kpi-label">Órdenes de Cambio</div><div class="kpi-value" style="color:var(--green)">-$90,989</div><div class="kpi-sub">3 OC autorizadas</div></div>
+          <div class="kpi c-cyan"><div class="kpi-label">Presupuesto Vigente</div><div class="kpi-value">$272,215</div><div class="kpi-sub">Contrato actualizado</div></div>
+          <div class="kpi c-green"><div class="kpi-label">Pagado</div><div class="kpi-value">$24,222</div><div class="kpi-sub">P1 — Ingenierías ✓</div></div>
         </div>
 
         <!-- Cost breakdown expandable -->
@@ -687,19 +688,98 @@ textarea{resize:vertical;min-height:70px}
               <table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:580px">
                 <tr style="border-bottom:1px solid var(--border)">
                   <td style="padding:.6rem .9rem;font-weight:700;color:var(--text)">Subtotal Directo (A–K)</td>
-                  <td colspan="3" style="text-align:right;padding:.6rem .9rem;color:var(--muted);font-size:.78rem">$244,820.40</td>
+                  <td colspan="3" style="text-align:right;padding:.6rem .9rem;color:var(--muted);font-size:.78rem">Presupuesto vigente c/ OC's</td>
                   <td style="text-align:right;padding:.6rem .9rem;font-weight:700" x-text="'$'+fmtN(costGrandTotal('orig'))"></td>
                   <td style="text-align:right;padding:.6rem .9rem;font-weight:700" :style="costGrandTotal('adj')>costGrandTotal('orig')?'color:var(--red)':'color:var(--text)'" x-text="'$'+fmtN(costGrandTotal('adj'))"></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--border);background:#fff">
-                  <td style="padding:.5rem .9rem;color:var(--muted);font-size:.78rem">+ Ingenierías — Pago 1 (facturado)</td>
+                  <td style="padding:.5rem .9rem;color:var(--muted);font-size:.78rem">+ Ingenierías P1 (incluido en vigente)</td>
                   <td colspan="4" style="text-align:right;padding:.5rem .9rem;color:var(--green);font-weight:600;font-size:.78rem">$24,222.37</td>
                   <td></td>
                 </tr>
                 <tr style="background:var(--dark);color:#fff">
                   <td style="padding:.7rem .9rem;font-weight:800;font-size:.88rem" colspan="4">GRAN TOTAL DEL PROYECTO</td>
-                  <td colspan="2" style="text-align:right;padding:.7rem .9rem;font-weight:800;font-size:.95rem;color:#00C8D7">$293,524.81</td>
+                  <td colspan="2" style="text-align:right;padding:.7rem .9rem;font-weight:800;font-size:.95rem;color:#00C8D7">$272,215.07</td>
                 </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Trazabilidad presupuestal -->
+        <div class="card" style="margin-bottom:1.2rem">
+          <div class="card-header">
+            <div class="card-title">Trazabilidad Presupuestal — Evolución del Contrato</div>
+            <span class="badge bg-cyan">3 Órdenes de Cambio</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="min-width:160px">Concepto</th>
+                    <th class="td-r">Catálogo</th>
+                    <th class="td-r">Ind. (4%)</th>
+                    <th class="td-r">Util. (7%)</th>
+                    <th class="td-r">Dscto. (10%)</th>
+                    <th class="td-r" style="color:var(--cyan)">Impacto Contrato</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="font-weight:700;background:#f8f9fc">
+                    <td>Presupuesto Original</td>
+                    <td class="td-r">$330,185.28</td>
+                    <td class="td-r">$13,207.41</td>
+                    <td class="td-r">$23,112.97</td>
+                    <td class="td-r" style="color:var(--green)">-$33,018.53</td>
+                    <td class="td-r" style="font-size:.88rem;color:var(--dark)">$363,203.80</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-amber" style="margin-right:.4rem">OC-01</span>Reducción Mobiliario (09 Jun 2026)</td>
+                    <td class="td-r" style="color:var(--red)">-$43,871.31</td>
+                    <td class="td-r" style="color:var(--red)">-$1,754.85</td>
+                    <td class="td-r" style="color:var(--red)">-$3,070.99</td>
+                    <td class="td-r" style="color:var(--green)">+$4,387.13</td>
+                    <td class="td-r" style="color:var(--red)">-$48,258.44</td>
+                  </tr>
+                  <tr style="background:#f8f9fc">
+                    <td style="padding-left:1.5rem;font-size:.78rem;color:var(--muted)">Presupuesto tras OC-01</td>
+                    <td class="td-r"></td><td class="td-r"></td><td class="td-r"></td><td class="td-r"></td>
+                    <td class="td-r" style="font-weight:700">$314,945.36</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-amber" style="margin-right:.4rem">OC-02</span>Calidades en Acabados (06 Jul 2026)</td>
+                    <td class="td-r" style="color:var(--red)">-$18,965.61</td>
+                    <td class="td-r" style="color:var(--red)">-$758.62</td>
+                    <td class="td-r" style="color:var(--red)">-$1,327.59</td>
+                    <td class="td-r" style="color:var(--green)">+$1,896.56</td>
+                    <td class="td-r" style="color:var(--red)">-$20,862.17</td>
+                  </tr>
+                  <tr style="background:#f8f9fc">
+                    <td style="padding-left:1.5rem;font-size:.78rem;color:var(--muted)">Presupuesto tras OC-02</td>
+                    <td class="td-r"></td><td class="td-r"></td><td class="td-r"></td><td class="td-r"></td>
+                    <td class="td-r" style="font-weight:700">$294,083.19</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-amber" style="margin-right:.4rem">OC-03</span>Cambio Diseño Estructural (17 Jul 2026)</td>
+                    <td class="td-r" style="color:var(--red)">-$19,880.11</td>
+                    <td class="td-r" style="color:var(--red)">-$795.20</td>
+                    <td class="td-r" style="color:var(--red)">-$1,391.61</td>
+                    <td class="td-r" style="color:var(--green)">+$1,988.01</td>
+                    <td class="td-r" style="color:var(--red)">-$21,868.12</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="background:var(--dark);color:#fff;font-weight:800;font-size:.88rem">
+                    <td style="padding:.75rem .9rem">PRESUPUESTO VIGENTE</td>
+                    <td class="td-r" style="color:rgba(255,255,255,.5)">$247,468.25</td>
+                    <td class="td-r" style="color:rgba(255,255,255,.5)">$9,898.73</td>
+                    <td class="td-r" style="color:rgba(255,255,255,.5)">$17,322.78</td>
+                    <td class="td-r" style="color:rgba(255,255,255,.5)">-$24,746.82</td>
+                    <td class="td-r" style="color:var(--cyan);font-size:1rem">$272,215.07</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
@@ -707,7 +787,7 @@ textarea{resize:vertical;min-height:70px}
 
         <!-- Amortization table -->
         <div class="card">
-          <div class="card-header"><div class="card-title">Tabla de Amortizaciones — 8 Pagos</div><span class="badge bg-green">1 de 8 pagado</span></div>
+          <div class="card-header"><div class="card-title">Tabla de Amortizaciones — 8 Pagos</div><span class="badge bg-green">1 de 8 pagado ✓</span></div>
           <div class="card-body">
             <div class="tbl-wrap">
               <table>
@@ -722,7 +802,7 @@ textarea{resize:vertical;min-height:70px}
                   </template>
                   <tr style="font-weight:800;background:var(--light)">
                     <td colspan="3" style="text-align:right">TOTAL</td>
-                    <td class="td-r">$293,524.81</td><td></td>
+                    <td class="td-r">$272,215.07</td><td></td>
                   </tr>
                 </tbody>
               </table>
@@ -730,6 +810,112 @@ textarea{resize:vertical;min-height:70px}
                 * Todos los pagos son en efectivo y se registran sin IVA. En caso de que la cliente solicite
                 pago por transferencia, se emitirá factura y se aplicará IVA 16% sobre el monto correspondiente.
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ═══ ÓRDENES DE CAMBIO ═══ -->
+      <div x-show="tab==='oc'">
+        <div class="card" style="margin-bottom:1.2rem">
+          <div class="card-header">
+            <div class="card-title">Resumen de Órdenes de Cambio</div>
+            <span class="badge bg-cyan">3 OC · Total -$90,988.73</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Motivo / Descripción</th><th>Fecha</th><th>Solicitante</th><th class="td-r">Impacto Catálogo</th><th class="td-r">Impacto Contrato</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>OC-01</strong></td>
+                    <td>
+                      <div style="font-weight:600;font-size:.82rem">Reducción de Mobiliario</div>
+                      <div style="font-size:.73rem;color:var(--muted);margin-top:.15rem">Eliminación de closet modular nogal claro y mueble fijo TV del alcance del proyecto.</div>
+                    </td>
+                    <td>09/06/2026</td>
+                    <td><span class="badge bg-purple">👩‍💼 Cliente</span></td>
+                    <td class="td-r" style="color:var(--red)">-$43,871.31</td>
+                    <td class="td-r" style="color:var(--red);font-weight:700">-$48,258.44</td>
+                    <td><span class="badge bg-green">✓ Aprobado</span></td>
+                  </tr>
+                  <tr style="background:#fafbff">
+                    <td><strong>OC-02</strong></td>
+                    <td>
+                      <div style="font-weight:600;font-size:.82rem">Calidades en Acabados</div>
+                      <div style="font-size:.73rem;color:var(--muted);margin-top:.15rem">Ajuste de especificaciones en piso cerámico, zóclo, pinturas (interior, exterior y cielos) e impermeabilización. Se ajustaron cantidades y precios unitarios conforme al diseño final.</div>
+                    </td>
+                    <td>06/07/2026</td>
+                    <td><span class="badge bg-purple">👩‍💼 Cliente</span></td>
+                    <td class="td-r" style="color:var(--red)">-$18,965.61</td>
+                    <td class="td-r" style="color:var(--red);font-weight:700">-$20,862.17</td>
+                    <td><span class="badge bg-green">✓ Aprobado</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>OC-03</strong></td>
+                    <td>
+                      <div style="font-weight:600;font-size:.82rem">Cambio de Diseño Estructural</div>
+                      <div style="font-size:.73rem;color:var(--muted);margin-top:.15rem">La cotización original se elaboró sin ingenierías ni planos. Con el proyecto estructural definitivo se recalcularon volúmenes reales de cimentación, estructura de losa, castillos y elementos de albañilería, resultando en una reducción neta respecto al estimado inicial.</div>
+                    </td>
+                    <td>17/07/2026</td>
+                    <td><span class="badge bg-cyan">👷 Director de Proyecto</span></td>
+                    <td class="td-r" style="color:var(--red)">-$19,880.11</td>
+                    <td class="td-r" style="color:var(--red);font-weight:700">-$21,868.12</td>
+                    <td><span class="badge bg-green">✓ Aprobado</span></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="background:var(--dark);color:#fff;font-weight:800">
+                    <td colspan="4" style="padding:.65rem .9rem">TOTAL ÓRDENES DE CAMBIO</td>
+                    <td class="td-r" style="color:rgba(255,255,255,.7)">-$82,717.03</td>
+                    <td class="td-r" style="color:var(--cyan)">-$90,988.73</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waterfall visual -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Evolución del Presupuesto</div></div>
+          <div class="card-body">
+            <div style="display:flex;gap:.5rem;align-items:flex-end;height:140px;padding-bottom:.5rem;border-bottom:2px solid var(--border);margin-bottom:.75rem">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem">
+                <div style="background:var(--dark);border-radius:4px 4px 0 0;width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.3rem">
+                  <span style="font-size:.65rem;color:rgba(255,255,255,.8);font-weight:700">$363,204</span>
+                </div>
+                <span style="font-size:.6rem;color:var(--muted);text-align:center">Original</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem">
+                <div style="background:var(--red);border-radius:4px 4px 0 0;width:100%;height:13%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.2rem">
+                  <span style="font-size:.6rem;color:#fff;font-weight:700">-$48K</span>
+                </div>
+                <span style="font-size:.6rem;color:var(--muted);text-align:center">OC-01</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem">
+                <div style="background:var(--red);border-radius:4px 4px 0 0;width:100%;height:6%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.2rem">
+                  <span style="font-size:.6rem;color:#fff;font-weight:700">-$21K</span>
+                </div>
+                <span style="font-size:.6rem;color:var(--muted);text-align:center">OC-02</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem">
+                <div style="background:var(--red);border-radius:4px 4px 0 0;width:100%;height:6%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.2rem">
+                  <span style="font-size:.6rem;color:#fff;font-weight:700">-$22K</span>
+                </div>
+                <span style="font-size:.6rem;color:var(--muted);text-align:center">OC-03</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem">
+                <div style="background:var(--cyan);border-radius:4px 4px 0 0;width:100%;height:75%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.3rem">
+                  <span style="font-size:.65rem;color:#fff;font-weight:800">$272,215</span>
+                </div>
+                <span style="font-size:.6rem;color:var(--cyan);font-weight:700;text-align:center">Vigente</span>
+              </div>
+            </div>
+            <div style="font-size:.74rem;color:var(--muted);line-height:1.7">
+              El presupuesto vigente es <strong>$272,215.07</strong> (-25.05% respecto al original), resultado de 3 órdenes de cambio autorizadas que ajustaron el alcance y especificaciones del proyecto con base en las ingenierías definitivas y decisiones de la clienta.
             </div>
           </div>
         </div>
@@ -1061,8 +1247,8 @@ function app(){
     ],
     newComm:{type:'issue',text:''},
     newDesign:{element:'Piso / Acabados',desc:''},
-    currentVersion:'1.2',
-    kpi:{ avance:8 },
+    currentVersion:'1.3',
+    kpi:{ avance:9 },
 
     init(){
       if(sessionStorage.getItem('arepa_client_auth')==='1') this.unlocked=true;
@@ -1084,7 +1270,7 @@ function app(){
     nav(t){ this.tab=t; this.sidebarOpen=false; },
 
     tabTitle(){
-      const m={dashboard:'Dashboard',scope:'Alcance del Proyecto',schedule:'Cronograma',cost:'Costos',risk:'Riesgos',quality:'Control de Calidad',comms:'Comunicaciones',creative:'Taller Creativo',docs:'Documentos',reports:'Reportes'};
+      const m={dashboard:'Dashboard',scope:'Alcance del Proyecto',schedule:'Cronograma',cost:'Costos',oc:'Órdenes de Cambio',risk:'Riesgos',quality:'Control de Calidad',comms:'Comunicaciones',creative:'Taller Creativo',docs:'Documentos',reports:'Reportes'};
       return m[this.tab]||'';
     },
     daysSinceStart(){ return Math.max(0,Math.floor((new Date()-new Date('2026-06-18T12:00:00'))/86400000)); },
@@ -1120,7 +1306,7 @@ function app(){
     // Scope
     chTotal(ch){ if(ch.subtotal) return ch.subtotal*1.1; return ch.tasks.reduce((a,t)=>a+this.taskTotal(t),0); },
     taskTotal(tk){ return tk.concepts.reduce((a,c)=>a+c.qty*c.up,0); },
-    grandTotal(){ return this.scopeChapters.reduce((a,ch)=>a+this.chTotal(ch),0); },
+    grandTotal(){ return 272215.07; },
     scopeAllOpen(v){ this.scopeChapters.forEach(ch=>{ch.open=v;ch.tasks.forEach(t=>t.open=v);}); },
 
     // Cost
@@ -1180,6 +1366,7 @@ function app(){
 
     // ═══ DATA ═══
     versions:[
+      { ver:'1.3', date:'18 Jul 2026', label:'OC\'s + Catálogo Real', changes:['Ingenierías completadas al 100% — Fase 1 concluida','OC-01, OC-02 y OC-03 registradas — Presupuesto vigente $272,215.07','Trazabilidad presupuestal visible en Costos','Nueva pestaña Órdenes de Cambio con desglose completo','Catálogo de conceptos actualizado al máximo nivel de detalle','Inicio de Construcción: 28 Jul 2026 — Anticipo: $99,197.08'] },
       { ver:'1.2', date:'07 Jul 2026', label:'Avances y documentos', changes:['Estatus actualizado: Tareas 1, 2 y 3 completadas','Programa de obra reprogramado: construcción inicia 27 Jul','Documentos técnicos y legales: 8 archivos disponibles','Alcance Proyecto Ejecutivo: 3 ingenierías terminadas'] },
       { ver:'1.1', date:'20 Jun 2026', label:'Mejoras UI', changes:['Alcance por capítulos con cantidades de obra','Gantt expandible por fases','Desglose de costos por volumen','Semáforo de calidad con fotos','Control de versiones activado'] },
       { ver:'1.0', date:'18 Jun 2026', label:'Lanzamiento', changes:['Portal activado y compartido con cliente','Datos iniciales del proyecto A-RE-PA cargados','Gantt, Riesgos, Costos y Comunicaciones activos','Acceso protegido por NIP'] },
@@ -1187,17 +1374,17 @@ function app(){
 
     milestones:[
       {id:1,date:'18 Jun 2026',title:'Inicio del Proyecto',sub:'Contrato + Pago 1',status:'done'},
-      {id:2,date:'18 Jun–03 Jul',title:'Fase 1 — Proyecto Ejecutivo',sub:'Ingenierías + renders',status:'active'},
-      {id:3,date:'03 Jul 2026',title:'Entrega Proyecto Ejecutivo',sub:'Planos + memorias',status:'pending'},
-      {id:4,date:'10 Jul 2026',title:'Pago 2 — Anticipo Obra',sub:'$107,720.98',status:'pending'},
-      {id:5,date:'27 Jul 2026',title:'Inicio Construcción',sub:'Fase 2 — Obra civil',status:'pending'},
+      {id:2,date:'18 Jun–17 Jul',title:'Fase 1 — Proyecto Ejecutivo',sub:'Ingenierías + renders',status:'done'},
+      {id:3,date:'17 Jul 2026',title:'Entrega Proyecto Ejecutivo',sub:'Planos + memorias',status:'done'},
+      {id:4,date:'28 Jul 2026',title:'Pago 2 — Anticipo Obra',sub:'$99,197.08',status:'pending'},
+      {id:5,date:'28 Jul 2026',title:'Inicio Construcción',sub:'Fase 2 — Obra civil',status:'pending'},
       {id:6,date:'14 Sep 2026',title:'Entrega Formal',sub:'Acta + Pago 8 Final',status:'pending'},
     ],
 
     phases:[
-      {id:1,name:'F1 — Ingenierías',offset:0,width:22,range:'18 Jun–03 Jul',status:'Activo',badge:'bg-blue',color:'var(--purple)'},
+      {id:1,name:'F1 — Ingenierías',offset:0,width:22,range:'18 Jun–17 Jul',status:'Completado',badge:'bg-green',color:'var(--purple)'},
       {id:2,name:'Revisión',offset:22,width:8,range:'06–10 Jul',status:'Pendiente',badge:'bg-gray',color:'var(--cyan)'},
-      {id:3,name:'F2 — Construcción',offset:39,width:49,range:'27 Jul–14 Sep',status:'Pendiente',badge:'bg-gray',color:'var(--pink)'},
+      {id:3,name:'F2 — Construcción',offset:39,width:49,range:'28 Jul–14 Sep',status:'Pendiente',badge:'bg-gray',color:'var(--pink)'},
     ],
 
     ganttPhases:[
@@ -1210,9 +1397,9 @@ function app(){
       {id:1,name:'Levantamiento arquitectónico',startDay:0,dur:3,pred:'-',critical:false,color:'#9B5FD4',status:'Completado',s0:'18 Jun',e0:'20 Jun',rescheduled:null},
       {id:2,name:'Proyecto arquitectónico + renders',startDay:0,dur:11,pred:'1',critical:true,color:'#9B5FD4',status:'Completado',s0:'18 Jun',e0:'28 Jun',rescheduled:null},
       {id:3,name:'Proyecto estructural',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Completado',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
-      {id:4,name:'Proyecto hidráulico-sanitario',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'En proceso',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
-      {id:5,name:'Proyecto eléctrico',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'En proceso',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
-      {id:6,name:'Trámite Licencia Municipal (DUOT)',startDay:0,dur:23,pred:'-',critical:true,color:'#6d28d9',status:'En proceso',s0:'18 Jun',e0:'10 Jul',rescheduled:null},
+      {id:4,name:'Proyecto hidráulico-sanitario',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Completado',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:5,name:'Proyecto eléctrico',startDay:7,dur:9,pred:'1',critical:false,color:'#9B5FD4',status:'Completado',s0:'25 Jun',e0:'03 Jul',rescheduled:null},
+      {id:6,name:'Trámite Licencia Municipal (DUOT)',startDay:0,dur:23,pred:'-',critical:true,color:'#6d28d9',status:'En proceso',s0:'18 Jun',e0:'28 Jul',rescheduled:null},
       {id:7,name:'Revisión presupuesto / Aprobación',startDay:18,dur:5,pred:'2,6',critical:true,color:'#00C8D7',status:'Pendiente',s0:'06 Jul',e0:'10 Jul',rescheduled:null},
       {id:8,name:'Adecuaciones preliminares (registros/boiler)',startDay:25,dur:5,pred:'7',critical:true,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'17 Jul',rescheduled:null},
       {id:9,name:'Movilización, trazo y nivelación',startDay:25,dur:4,pred:'7',critical:false,color:'#FF3EA5',status:'Pendiente',s0:'13 Jul',e0:'16 Jul',rescheduled:'2026-07-27'},
@@ -1225,171 +1412,166 @@ function app(){
     ],
 
     scopeChapters:[
-      {id:'PE',subtotal:22020.34,name:'Proyecto Ejecutivo e Ingenierías',color:'#6d28d9',open:false,tasks:[
-        {id:'PE',name:'Proyecto ejecutivo completo',status:'En proceso',open:true,concepts:[
-          {id:'PE-01',desc:'Estudio de mecánica de suelos — sondeos superficiales a cielo abierto',unit:'Sondeo',qty:1,up:0},
-          {id:'PE-02',desc:'Elaboración de Proyecto Arquitectónico (<500m²): plantas, fachadas y detalles',unit:'m²',qty:37,up:0},
-          {id:'PE-03',desc:'Elaboración de Proyecto Estructural (<500m²): memoria de cálculo y planos',unit:'m²',qty:37,up:0},
-          {id:'PE-04',desc:'Elaboración de Proyecto Hidráulico-Sanitario (<500m²): memoria, planos e isométricos',unit:'m²',qty:37,up:0},
-          {id:'PE-05',desc:'Elaboración de Proyecto Eléctrico (<500m²): memoria, planos y diagramas unifilares',unit:'m²',qty:37,up:0},
+      {id:'A',name:'Proyecto Ejecutivo',color:'#6d28d9',open:false,tasks:[
+        {id:'A',name:'Ingenierías y proyecto',status:'done',open:false,concepts:[
+          {id:'G100100-1000',desc:'Sondeo mecánica de suelos (cielo abierto)',unit:'Sondeo',qty:1,up:12355},
+          {id:'G100101-1000',desc:'Proyecto arquitectónico (<500 m²)',unit:'m²',qty:33.18,up:85.80},
+          {id:'G100101-1005',desc:'Proyecto estructural (<500 m²)',unit:'m²',qty:33.18,up:65.00},
+          {id:'G100101-1010',desc:'Proyecto inst. hidráulico-sanitarias',unit:'m²',qty:33.18,up:65.00},
+          {id:'G100101-1015',desc:'Proyecto inst. eléctricas',unit:'m²',qty:33.18,up:75.50},
         ]},
       ]},
-      {id:'A',subtotal:10150.0,name:'Obras Preliminares',color:'#FF3EA5',open:false,tasks:[
-        {id:'A',name:'Trazo, demolición y desalojo',status:'pending',open:true,concepts:[
-          {id:'A-01',desc:'Trazo y nivelación de áreas de trabajo',unit:'m²',qty:37,up:140},
-          {id:'A-02',desc:'Demolición selectiva de muros y acabados',unit:'m²',qty:13.5,up:220},
-          {id:'A-03',desc:'Acarreo y desalojo de escombro',unit:'viaje',qty:4,up:500},
+      {id:'B',name:'Preliminares y Demoliciones',color:'#FF3EA5',open:false,tasks:[
+        {id:'B',name:'Demolición, trazo y desalojo',status:'pending',open:false,concepts:[
+          {id:'G100100-1000b',desc:'Demolición banqueta concreto simple',unit:'m²',qty:7.005,up:155.00},
+          {id:'G105100-1030',desc:'⚑OC-03 Demolición mampostería piedra',unit:'m³',qty:4.603,up:1300.00},
+          {id:'G105100-1065',desc:'Demolición muros tabique 14 cm',unit:'m³',qty:1.9968,up:954.99},
+          {id:'G105100-1135',desc:'Demolición losa exterior',unit:'m²',qty:4.2,up:124.71},
+          {id:'G105100-1170',desc:'Demolición aplanados mezcla 2.5 cm',unit:'m²',qty:7.68,up:132.51},
+          {id:'G105101-1132',desc:'Demolición base boiler',unit:'m³',qty:0.25,up:1746.16},
+          {id:'G105105-1040',desc:'Desmontaje ventanas de herrería',unit:'m²',qty:9.2,up:278.89},
+          {id:'G105110-1000',desc:'Trazo y nivelación topográfico',unit:'m²',qty:33.18,up:46.98},
+          {id:'G105110-1010',desc:'Trazo y nivelación cepas de tuberías',unit:'ml',qty:19.85,up:52.12},
+          {id:'G105116-1030',desc:'⚑OC-03 Relleno material de excavación',unit:'m³',qty:2.679375,up:539.79},
+          {id:'G105118-1240',desc:'Acarreo en carretilla dist. 20 m',unit:'m³',qty:9.3748,up:539.79},
+          {id:'G105119-1200',desc:'Acarreo en camión — escombro',unit:'m³',qty:9.3748,up:668.15},
         ]},
       ]},
-      {id:'B',subtotal:72800.0,name:'Cimentación y Estructura',color:'#9B5FD4',open:false,tasks:[
-        {id:'B',name:'Obra de cimentación y elementos estructurales',status:'pending',open:true,concepts:[
-          {id:'B-01',desc:'Excavación de cepas y nivelación',unit:'m³',qty:8.4,up:500},
-          {id:'B-02',desc:'Plantilla de concreto simple fc=100 kg/cm²',unit:'m²',qty:24,up:210},
-          {id:'B-03',desc:'Zapatas corridas concreto armado fc=200',unit:'m³',qty:3.2,up:5000},
-          {id:'B-04',desc:'Trabes de liga 20×40 cm',unit:'m',qty:18,up:900},
-          {id:'B-05',desc:'Columnas 20×20 cm',unit:'m',qty:24,up:700},
-          {id:'B-06',desc:'Losa maciza e=12 cm fc=200 kg/cm²',unit:'m²',qty:24,up:600},
-          {id:'B-07',desc:'Acero de refuerzo fy=4200 (complemento)',unit:'kg',qty:1,up:160},
+      {id:'C',name:'Cimentaciones',color:'#9B5FD4',open:false,tasks:[
+        {id:'C',name:'Cimentación y plantilla',status:'pending',open:false,concepts:[
+          {id:'G110050-1000',desc:'⚑OC-03 Trazo y nivelación cimentación',unit:'m²',qty:10.66,up:33.97},
+          {id:'G110060-1000',desc:'⚑OC-03 Plantilla fc=100 kg/cm² — 5 cm',unit:'m²',qty:10.66,up:268.87},
+          {id:'G110100-1015',desc:'⚑OC-03 Acero No.3 en cimentación',unit:'kg',qty:292.0075,up:41.514},
+          {id:'G110105-1000',desc:'⚑OC-03 Cimbra madera cimentación',unit:'m²',qty:15.996,up:735.94},
+          {id:'G110110-1150',desc:'⚑OC-03 Concreto fc=200 kg/cm² cimentación',unit:'m³',qty:3.60,up:4805.82},
+          {id:'G110121-1005',desc:'⚑OC-03 Compactación de desplante',unit:'m³',qty:2.136,up:130.46},
         ]},
       ]},
-      {id:'C',subtotal:45200.0,name:'Mampostería e Interiores',color:'#00C8D7',open:false,tasks:[
-        {id:'C',name:'Muros, castillos, dalas y aplanados',status:'pending',open:true,concepts:[
-          {id:'C-01',desc:'Muro de tabicón rojo recocido',unit:'m²',qty:48,up:350},
-          {id:'C-02',desc:'Castillos de concreto armado 15×15 cm',unit:'m',qty:32,up:330},
-          {id:'C-03',desc:'Dalas de cierre 20×20 cm',unit:'m',qty:24,up:270},
-          {id:'C-04',desc:'Aplanado de yeso interiores',unit:'m²',qty:86,up:100},
-          {id:'C-05',desc:'Aplanado de mortero exteriores',unit:'m²',qty:38,up:72.63},
+      {id:'D',name:'Estructura — Losas',color:'#00C8D7',open:false,tasks:[
+        {id:'D',name:'Losa y trabes',status:'pending',open:false,concepts:[
+          {id:'G115105-1050',desc:'⚑OC-03 Cimbra losas y trabes',unit:'m²',qty:20.15,up:729.60},
+          {id:'G115130-1005',desc:'⚑OC-03 Losa plana 10 cm fc=200 kg/cm²',unit:'m²',qty:19.08,up:1399.29},
         ]},
       ]},
-      {id:'D',subtotal:22300.0,name:'Instalación Hidráulica-Sanitaria',color:'#FF3EA5',open:false,tasks:[
-        {id:'D',name:'Red hidráulica y drenaje sanitario',status:'pending',open:true,concepts:[
-          {id:'D-01',desc:'Alimentación agua fría CPVC 3/4"',unit:'m',qty:14,up:380},
-          {id:'D-02',desc:'Red de distribución CPVC 1/2"',unit:'m',qty:22,up:310},
-          {id:'D-03',desc:'Drenaje sanitario PVC 4"',unit:'m',qty:18,up:350},
-          {id:'D-04',desc:'WC de piso con fluxómetro',unit:'pza',qty:1,up:1980},
-          {id:'D-05',desc:'Lavabo con mezcladora',unit:'pza',qty:1,up:1880},
+      {id:'E',name:'Albañilería',color:'#FF3EA5',open:false,tasks:[
+        {id:'E',name:'Muros, castillos y firmes',status:'pending',open:false,concepts:[
+          {id:'G140100-2010',desc:'⚑OC-03 Castillo 10×15 cm fc=150 kg/cm²',unit:'ml',qty:27.00,up:481.12},
+          {id:'G140110-1080',desc:'Firme 5 cm fc=150 floteado',unit:'m²',qty:16.9,up:326.99},
+          {id:'G140130-1025',desc:'Entortado azotea 3 cm',unit:'m³',qty:1.707,up:269.17},
+          {id:'G140305-110',desc:'Cimbra castillos y cadenas',unit:'m²',qty:4.365,up:659.45},
+          {id:'G145115-2400',desc:'Muro block gris 10×20×40 cm',unit:'m²',qty:7.1295,up:483.00},
         ]},
       ]},
-      {id:'E',subtotal:18800.0,name:'Instalación Eléctrica',color:'#9B5FD4',open:false,tasks:[
-        {id:'E',name:'Tablero, circuitos y luminarias',status:'pending',open:true,concepts:[
-          {id:'E-01',desc:'Tablero eléctrico 8 circuitos',unit:'pza',qty:1,up:5200},
-          {id:'E-02',desc:'Circuitos de iluminación calibre 12 AWG',unit:'circ.',qty:4,up:1900},
-          {id:'E-03',desc:'Circuitos de contactos calibre 12 AWG',unit:'circ.',qty:3,up:1700},
-          {id:'E-04',desc:'Contactos, apagadores y luminarias LED',unit:'pza',qty:12,up:75},
+      {id:'F',name:'Acabados',color:'#9B5FD4',open:false,tasks:[
+        {id:'F',name:'Pisos, pintura e impermeabilización',status:'pending',open:false,concepts:[
+          {id:'G500105-0015',desc:'⚑OC-02 Piso cerámica 60×120 Interceramic',unit:'m²',qty:28.58,up:628.88},
+          {id:'G500105-3045',desc:'⚑OC-02 Zóclo 10 cm cerámica 60×120',unit:'ml',qty:18.2,up:628.88},
+          {id:'G500140-001',desc:'Aplanado Estuco Econotex exterior',unit:'m²',qty:18.733,up:383.61},
+          {id:'G500140-1200',desc:'Aplanado yeso-agua en losas',unit:'m²',qty:15.83,up:235.50},
+          {id:'G500170-1040',desc:'⚑OC-02 Pintura vinílica muros int. Vinimex 700',unit:'m²',qty:57.344,up:166.01},
+          {id:'G500170-1001',desc:'⚑OC-02 Pintura vinílica muros ext. Vinimex 700',unit:'m²',qty:18.733,up:171.73},
+          {id:'G500170-1165',desc:'⚑OC-02 Pintura vinílica cielos Vinimex 700',unit:'m²',qty:17,up:201.59},
+          {id:'G500250-1075',desc:'Limpieza general durante obra',unit:'m²',qty:33.18,up:25.30},
+          {id:'G500310-0001',desc:'⚑OC-02 Impermeabilización azotea Impercrest 5 años',unit:'m²',qty:24,up:25.30},
         ]},
       ]},
-      {id:'F',subtotal:12000.0,name:'Remodelación Área Existente (13 m²)',color:'#00C8D7',open:false,tasks:[
-        {id:'F',name:'Demolición, aplanados y reparación de losa',status:'pending',open:true,concepts:[
-          {id:'F-01',desc:'Demolición y retiro de acabados',unit:'m²',qty:13,up:180},
-          {id:'F-02',desc:'Aplanado fino de yeso',unit:'m²',qty:55,up:140},
-          {id:'F-03',desc:'Reparación de losa e impermeabilización',unit:'m²',qty:13,up:150},
+      {id:'G',name:'Carpintería / Mobiliario',color:'#00C8D7',open:false,tasks:[
+        {id:'G',name:'Mobiliario (OC-01: elementos eliminados)',status:'done',open:false,concepts:[
+          {id:'G560100-1040a',desc:'⚑OC-01 ELIMINADO — Closet modular nogal claro',unit:'pza',qty:0,up:23871.31},
+          {id:'G560100-1040b',desc:'⚑OC-01 ELIMINADO — Mueble fijo TV nogal claro',unit:'pza',qty:0,up:20000.00},
         ]},
       ]},
-      {id:'G',subtotal:29419.01,name:'Pisos ★',color:'#FF3EA5',open:false,tasks:[
-        {id:'G',name:'Acabados en piso',status:'pending',open:true,concepts:[
-          {id:'G-01',desc:'Porcelanato 60×60 cm primera calidad',unit:'m²',qty:46.77,up:628.88},
+      {id:'H',name:'Puertas y Ventanas',color:'#FF3EA5',open:false,tasks:[
+        {id:'H',name:'Herrería y carpintería',status:'pending',open:false,concepts:[
+          {id:'G600105-1500',desc:'Puerta madera exterior 95×206 cm',unit:'pza',qty:1,up:953.62},
+          {id:'G600200-1257',desc:'Ventana aluminio negro 1.20×2.50 m',unit:'pza',qty:1,up:4774.37},
         ]},
       ]},
-      {id:'H',subtotal:607.2,name:'Impermeabilización ★',color:'#9B5FD4',open:false,tasks:[
-        {id:'H',name:'Impermeabilizante elastomérico',status:'pending',open:true,concepts:[
-          {id:'H-01',desc:'Impermeabilizante elastomérico en cubiertas',unit:'Global',qty:1,up:607.20},
-        ]},
-      ]},
-      {id:'I',subtotal:15656.11,name:'Pintura ★',color:'#00C8D7',open:false,tasks:[
-        {id:'I',name:'Pintura vinílica muros, cielos y complemento',status:'pending',open:true,concepts:[
-          {id:'I-01',desc:'Pintura vinílica muros interiores',unit:'m²',qty:74,up:166.01},
-          {id:'I-02',desc:'Pintura vinílica cielos',unit:'m²',qty:19,up:171.73},
-          {id:'I-03',desc:'Complemento pintura (detalles y remates)',unit:'Global',qty:1,up:108.50},
-        ]},
-      ]},
-      {id:'J',subtotal:11788.08,name:'Carpintería y Herrería',color:'#FF3EA5',open:false,tasks:[
-        {id:'J',name:'Puertas, ventanas y protecciones',status:'pending',open:true,concepts:[
-          {id:'J-01',desc:'Puerta principal herrería forjada',unit:'pza',qty:1,up:4500},
-          {id:'J-02',desc:'Puertas interiores de madera (2 hojas)',unit:'pza',qty:2,up:2200},
-          {id:'J-03',desc:'Ventana aluminio con cristal 4 mm',unit:'m²',qty:4.8,up:481.27},
-          {id:'J-04',desc:'Protección de herrería fija en ventanas',unit:'m²',qty:2.4,up:241.25},
-        ]},
-      ]},
-      {id:'K',subtotal:6100.0,name:'Limpieza Final y Entrega',color:'#9B5FD4',open:false,tasks:[
-        {id:'K',name:'Limpieza y entrega formal',status:'pending',open:true,concepts:[
-          {id:'K-01',desc:'Limpieza general del inmueble',unit:'Global',qty:1,up:3500},
-          {id:'K-02',desc:'Entrega formal con pruebas operativas',unit:'Global',qty:1,up:2600},
+      {id:'I',name:'Instalaciones',color:'#9B5FD4',open:false,tasks:[
+        {id:'I',name:'Hidráulico, sanitario y eléctrico',status:'pending',open:false,concepts:[
+          {id:'G700100-0001',desc:'Adecuaciones instalaciones hidráulicas',unit:'Serv.',qty:1,up:5000.00},
+          {id:'G700100-0002',desc:'Adecuaciones instalaciones sanitarias',unit:'Serv.',qty:1,up:9000.00},
+          {id:'G700100-0003',desc:'Adecuaciones instalaciones eléctricas',unit:'Serv.',qty:1,up:7500.00},
         ]},
       ]},
     ],
 
     costChapters:[
-      {id:'A',name:'A — Obras Preliminares',color:'#FF3EA5',open:false,subtotal:10150,concepts:[
-        {id:'A-01',desc:'Trazo y nivelación de áreas de trabajo',unit:'m²',qty:37,up:154},
-        {id:'A-02',desc:'Demolición selectiva de muros y acabados',unit:'m²',qty:13.5,up:242},
-        {id:'A-03',desc:'Acarreo y desalojo de escombro',unit:'viaje',qty:4,up:550},
+      {id:'A',name:'A — Proyecto Ejecutivo',color:'#6d28d9',open:false,subtotal:0,concepts:[
+        {id:'G100100-1000',desc:'Sondeo mecánica de suelos',unit:'Sondeo',qty:1,up:12355},
+        {id:'G100101-1000',desc:'Proyecto arquitectónico',unit:'m²',qty:33.18,up:85.80},
+        {id:'G100101-1005',desc:'Proyecto estructural',unit:'m²',qty:33.18,up:65.00},
+        {id:'G100101-1010',desc:'Proyecto inst. hidráulico-sanitarias',unit:'m²',qty:33.18,up:65.00},
+        {id:'G100101-1015',desc:'Proyecto inst. eléctricas',unit:'m²',qty:33.18,up:75.50},
       ]},
-      {id:'B',name:'B — Cimentación y Estructura',color:'#9B5FD4',open:false,subtotal:72800,concepts:[
-        {id:'B-01',desc:'Excavación de cepas y nivelación',unit:'m³',qty:8.4,up:550},
-        {id:'B-02',desc:'Plantilla de concreto simple fc=100',unit:'m²',qty:24,up:231},
-        {id:'B-03',desc:'Zapatas corridas concreto armado fc=200',unit:'m³',qty:3.2,up:5500},
-        {id:'B-04',desc:'Trabes de liga 20×40 cm',unit:'m',qty:18,up:990},
-        {id:'B-05',desc:'Columnas 20×20 cm',unit:'m',qty:24,up:770},
-        {id:'B-06',desc:'Losa maciza e=12 cm fc=200 kg/cm²',unit:'m²',qty:24,up:660},
-        {id:'B-07',desc:'Acero de refuerzo fy=4200 (complemento)',unit:'kg',qty:1,up:176},
+      {id:'B',name:'B — Preliminares y Demoliciones',color:'#FF3EA5',open:false,subtotal:0,concepts:[
+        {id:'G100100-1000b',desc:'Demolición banqueta concreto simple',unit:'m²',qty:7.005,up:155.00},
+        {id:'G105100-1030',desc:'⚑OC-03 Demolición mampostería piedra',unit:'m³',qty:4.603,up:1300.00},
+        {id:'G105100-1065',desc:'Demolición muros tabique 14 cm',unit:'m³',qty:1.9968,up:954.99},
+        {id:'G105100-1135',desc:'Demolición losa exterior',unit:'m²',qty:4.2,up:124.71},
+        {id:'G105100-1170',desc:'Demolición aplanados mezcla 2.5 cm',unit:'m²',qty:7.68,up:132.51},
+        {id:'G105101-1132',desc:'Demolición base boiler',unit:'m³',qty:0.25,up:1746.16},
+        {id:'G105105-1040',desc:'Desmontaje ventanas herrería',unit:'m²',qty:9.2,up:278.89},
+        {id:'G105110-1000',desc:'Trazo y nivelación topográfico',unit:'m²',qty:33.18,up:46.98},
+        {id:'G105110-1010',desc:'Trazo y nivelación cepas tuberías',unit:'ml',qty:19.85,up:52.12},
+        {id:'G105116-1030',desc:'⚑OC-03 Relleno material excavación',unit:'m³',qty:2.679375,up:539.79},
+        {id:'G105118-1240',desc:'Acarreo en carretilla dist. 20 m',unit:'m³',qty:9.3748,up:539.79},
+        {id:'G105119-1200',desc:'Acarreo en camión escombro',unit:'m³',qty:9.3748,up:668.15},
       ]},
-      {id:'C',name:'C — Mampostería e Interiores',color:'#00C8D7',open:false,subtotal:45200,concepts:[
-        {id:'C-01',desc:'Muro de tabicón rojo recocido',unit:'m²',qty:48,up:385},
-        {id:'C-02',desc:'Castillos de concreto armado 15×15 cm',unit:'m',qty:32,up:363},
-        {id:'C-03',desc:'Dalas de cierre 20×20 cm',unit:'m',qty:24,up:297},
-        {id:'C-04',desc:'Aplanado de yeso interiores',unit:'m²',qty:86,up:110},
-        {id:'C-05',desc:'Aplanado de mortero exteriores',unit:'m²',qty:38,up:79.89},
+      {id:'C',name:'C — Cimentaciones',color:'#9B5FD4',open:false,subtotal:0,concepts:[
+        {id:'G110050-1000',desc:'⚑OC-03 Trazo y nivelación cimentación',unit:'m²',qty:10.66,up:33.97},
+        {id:'G110060-1000',desc:'⚑OC-03 Plantilla fc=100 kg/cm² — 5 cm',unit:'m²',qty:10.66,up:268.87},
+        {id:'G110100-1015',desc:'⚑OC-03 Acero No.3 en cimentación',unit:'kg',qty:292.0075,up:41.514},
+        {id:'G110105-1000',desc:'⚑OC-03 Cimbra madera cimentación',unit:'m²',qty:15.996,up:735.94},
+        {id:'G110110-1150',desc:'⚑OC-03 Concreto fc=200 cimentación',unit:'m³',qty:3.60,up:4805.82},
+        {id:'G110121-1005',desc:'⚑OC-03 Compactación de desplante',unit:'m³',qty:2.136,up:130.46},
       ]},
-      {id:'D',name:'D — Instalación Hidráulica-Sanitaria',color:'#FF3EA5',open:false,subtotal:22300,concepts:[
-        {id:'D-01',desc:'Alimentación agua fría CPVC 3/4"',unit:'m',qty:14,up:418},
-        {id:'D-02',desc:'Red de distribución CPVC 1/2"',unit:'m',qty:22,up:341},
-        {id:'D-03',desc:'Drenaje sanitario PVC 4"',unit:'m',qty:18,up:385},
-        {id:'D-04',desc:'WC de piso con fluxómetro',unit:'pza',qty:1,up:2178},
-        {id:'D-05',desc:'Lavabo con mezcladora',unit:'pza',qty:1,up:2068},
+      {id:'D',name:'D — Estructura / Losas',color:'#00C8D7',open:false,subtotal:0,concepts:[
+        {id:'G115105-1050',desc:'⚑OC-03 Cimbra losas y trabes',unit:'m²',qty:20.15,up:729.60},
+        {id:'G115130-1005',desc:'⚑OC-03 Losa plana 10 cm fc=200 kg/cm²',unit:'m²',qty:19.08,up:1399.29},
       ]},
-      {id:'E',name:'E — Instalación Eléctrica',color:'#9B5FD4',open:false,subtotal:18800,concepts:[
-        {id:'E-01',desc:'Tablero eléctrico 8 circuitos',unit:'pza',qty:1,up:5720},
-        {id:'E-02',desc:'Circuitos de iluminación calibre 12 AWG',unit:'circ.',qty:4,up:2090},
-        {id:'E-03',desc:'Circuitos de contactos calibre 12 AWG',unit:'circ.',qty:3,up:1870},
-        {id:'E-04',desc:'Contactos, apagadores y luminarias LED',unit:'pza',qty:12,up:82.50},
+      {id:'E',name:'E — Albañilería',color:'#FF3EA5',open:false,subtotal:0,concepts:[
+        {id:'G140100-2010',desc:'⚑OC-03 Castillo 10×15 cm fc=150 kg/cm²',unit:'ml',qty:27.00,up:481.12},
+        {id:'G140110-1080',desc:'Firme 5 cm fc=150 floteado',unit:'m²',qty:16.9,up:326.99},
+        {id:'G140130-1025',desc:'Entortado azotea 3 cm',unit:'m³',qty:1.707,up:269.17},
+        {id:'G140305-110',desc:'Cimbra castillos y cadenas',unit:'m²',qty:4.365,up:659.45},
+        {id:'G145115-2400',desc:'Muro block gris 10×20×40',unit:'m²',qty:7.1295,up:483.00},
       ]},
-      {id:'F',name:'F — Remodelación Área Existente (13 m²)',color:'#00C8D7',open:false,subtotal:12000,concepts:[
-        {id:'F-01',desc:'Demolición y retiro de acabados',unit:'m²',qty:13,up:198},
-        {id:'F-02',desc:'Aplanado fino de yeso',unit:'m²',qty:55,up:154},
-        {id:'F-03',desc:'Reparación de losa e impermeabilización',unit:'m²',qty:13,up:165},
+      {id:'F',name:'F — Acabados',color:'#9B5FD4',open:false,subtotal:0,concepts:[
+        {id:'G500105-0015',desc:'⚑OC-02 Piso cerámica 60×120 Interceramic',unit:'m²',qty:28.58,up:628.88},
+        {id:'G500105-3045',desc:'⚑OC-02 Zóclo 10 cm cerámica 60×120',unit:'ml',qty:18.2,up:628.88},
+        {id:'G500140-001',desc:'Aplanado Estuco Econotex exterior',unit:'m²',qty:18.733,up:383.61},
+        {id:'G500140-1200',desc:'Aplanado yeso-agua en losas',unit:'m²',qty:15.83,up:235.50},
+        {id:'G500170-1040',desc:'⚑OC-02 Pintura vinílica muros int. Vinimex 700',unit:'m²',qty:57.344,up:166.01},
+        {id:'G500170-1001',desc:'⚑OC-02 Pintura vinílica muros ext. Vinimex 700',unit:'m²',qty:18.733,up:171.73},
+        {id:'G500170-1165',desc:'⚑OC-02 Pintura vinílica cielos Vinimex 700',unit:'m²',qty:17,up:201.59},
+        {id:'G500250-1075',desc:'Limpieza general durante obra',unit:'m²',qty:33.18,up:25.30},
+        {id:'G500310-0001',desc:'⚑OC-02 Impermeabilización azotea Impercrest 5 años',unit:'m²',qty:24,up:25.30},
       ]},
-      {id:'G',name:'G — Pisos ★',color:'#FF3EA5',open:false,subtotal:29419.01,concepts:[
-        {id:'G-01',desc:'Porcelanato 60×60 cm primera calidad',unit:'m²',qty:46.77,up:691.77},
+      {id:'G',name:'G — Carpintería / Mobiliario',color:'#00C8D7',open:false,subtotal:0,concepts:[
+        {id:'G560100-1040a',desc:'⚑OC-01 ELIMINADO — Closet modular nogal claro',unit:'pza',qty:0,up:23871.31},
+        {id:'G560100-1040b',desc:'⚑OC-01 ELIMINADO — Mueble fijo TV nogal claro',unit:'pza',qty:0,up:20000.00},
       ]},
-      {id:'H',name:'H — Impermeabilización ★',color:'#9B5FD4',open:false,subtotal:607.20,concepts:[
-        {id:'H-01',desc:'Impermeabilizante elastomérico en cubiertas',unit:'Global',qty:1,up:667.92},
+      {id:'H',name:'H — Puertas y Ventanas',color:'#FF3EA5',open:false,subtotal:0,concepts:[
+        {id:'G600105-1500',desc:'Puerta madera exterior 95×206 cm',unit:'pza',qty:1,up:953.62},
+        {id:'G600200-1257',desc:'Ventana aluminio negro 1.20×2.50 m',unit:'pza',qty:1,up:4774.37},
       ]},
-      {id:'I',name:'I — Pintura ★',color:'#00C8D7',open:false,subtotal:15656.11,concepts:[
-        {id:'I-01',desc:'Pintura vinílica muros interiores',unit:'m²',qty:74,up:182.61},
-        {id:'I-02',desc:'Pintura vinílica cielos',unit:'m²',qty:19,up:188.90},
-        {id:'I-03',desc:'Complemento pintura (detalles y remates)',unit:'Global',qty:1,up:119.35},
-      ]},
-      {id:'J',name:'J — Carpintería y Herrería',color:'#FF3EA5',open:false,subtotal:11788.08,concepts:[
-        {id:'J-01',desc:'Puerta principal herrería forjada',unit:'pza',qty:1,up:4950},
-        {id:'J-02',desc:'Puertas interiores de madera (2 hojas)',unit:'pza',qty:2,up:2420},
-        {id:'J-03',desc:'Ventana aluminio con cristal 4 mm',unit:'m²',qty:4.8,up:529.40},
-        {id:'J-04',desc:'Protección herrería fija en ventanas',unit:'m²',qty:2.4,up:265.38},
-      ]},
-      {id:'K',name:'K — Limpieza Final y Entrega',color:'#9B5FD4',open:false,subtotal:6100,concepts:[
-        {id:'K-01',desc:'Limpieza general del inmueble',unit:'Global',qty:1,up:3850},
-        {id:'K-02',desc:'Entrega formal con pruebas operativas',unit:'Global',qty:1,up:2860},
+      {id:'I',name:'I — Instalaciones',color:'#9B5FD4',open:false,subtotal:0,concepts:[
+        {id:'G700100-0001',desc:'Adecuaciones instalaciones hidráulicas',unit:'Serv.',qty:1,up:5000.00},
+        {id:'G700100-0002',desc:'Adecuaciones instalaciones sanitarias',unit:'Serv.',qty:1,up:9000.00},
+        {id:'G700100-0003',desc:'Adecuaciones instalaciones eléctricas',unit:'Serv.',qty:1,up:7500.00},
       ]},
     ],
 
     payments:[
       {id:1,no:'P1',tipo:'Proyecto Ejecutivo e Ingenierías',fecha:'18/06/2026',monto:24222.37,status:'pagado'},
-      {id:2,no:'P2',tipo:'Anticipo de Obra (40%)',fecha:'10/07/2026',monto:107720.98,status:'pendiente'},
-      {id:3,no:'S1',tipo:'Estimación Semana 1',fecha:'18/07/2026',monto:26930.24,status:'pendiente'},
-      {id:4,no:'S2',tipo:'Estimación Semana 2',fecha:'25/07/2026',monto:26930.24,status:'pendiente'},
-      {id:5,no:'S3',tipo:'Estimación Semana 3',fecha:'31/07/2026',monto:26930.24,status:'pendiente'},
-      {id:6,no:'S4',tipo:'Estimación Semana 4',fecha:'07/08/2026',monto:26930.24,status:'pendiente'},
-      {id:7,no:'S5',tipo:'Estimación Semana 5',fecha:'14/08/2026',monto:26930.24,status:'pendiente'},
-      {id:8,no:'S6',tipo:'Estimación Semana 6 + Entrega',fecha:'21/08/2026',monto:26930.26,status:'pendiente'},
+      {id:2,no:'P2',tipo:'Anticipo de Obra Civil (40%)',fecha:'28/07/2026',monto:99197.08,status:'pendiente'},
+      {id:3,no:'S1',tipo:'Estimación de obra Semana 1',fecha:'04/08/2026',monto:24799.27,status:'pendiente'},
+      {id:4,no:'S2',tipo:'Estimación de obra Semana 2',fecha:'11/08/2026',monto:24799.27,status:'pendiente'},
+      {id:5,no:'S3',tipo:'Estimación de obra Semana 3',fecha:'18/08/2026',monto:24799.27,status:'pendiente'},
+      {id:6,no:'S4',tipo:'Estimación de obra Semana 4',fecha:'25/08/2026',monto:24799.27,status:'pendiente'},
+      {id:7,no:'S5',tipo:'Estimación de obra Semana 5',fecha:'01/09/2026',monto:24799.27,status:'pendiente'},
+      {id:8,no:'S6',tipo:'Estimación final + Entrega formal',fecha:'14/09/2026',monto:24799.27,status:'pendiente'},
     ],
 
     risks:[
@@ -1405,11 +1587,11 @@ function app(){
 
     qualityPhases:[
       {phase:'Fase 1 — Proyecto Ejecutivo',open:true,items:[
-        {id:101,desc:'Planos arquitectónicos a escala 1:50',norm:'RAS Torreón',normShort:'RAS',status:'active',semaphore:'gray',reporter:'pm',photos:[null,null],note:''},
-        {id:102,desc:'Memoria de cálculo estructural — firmada por DRO',norm:'NTC Sismo',normShort:'NTC',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
-        {id:103,desc:'Proyecto hidráulico con isométricos',norm:'NOM-001-CONAGUA',normShort:'CONAGUA',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
-        {id:104,desc:'Proyecto eléctrico con diagrama unifilar',norm:'NOM-001-SEDE',normShort:'SEDE',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:''},
-        {id:105,desc:'Licencia municipal obtenida y vigente',norm:'H. Ayuntamiento Torreón',normShort:'Mun.',status:'active',semaphore:'gray',reporter:'pm',photos:[null,null],note:'En trámite desde el 18 Jun'},
+        {id:101,desc:'Planos arquitectónicos a escala 1:50',norm:'RAS Torreón',normShort:'RAS',status:'done',semaphore:'green',reporter:'pm',photos:[null,null],note:'Entregados 17 Jul 2026'},
+        {id:102,desc:'Memoria de cálculo estructural — firmada por DRO',norm:'NTC Sismo',normShort:'NTC',status:'done',semaphore:'green',reporter:'pm',photos:[null,null],note:'Firmada y entregada 17 Jul 2026'},
+        {id:103,desc:'Proyecto hidráulico con isométricos',norm:'NOM-001-CONAGUA',normShort:'CONAGUA',status:'done',semaphore:'green',reporter:'pm',photos:[null,null],note:'Entregado 03 Jul 2026'},
+        {id:104,desc:'Proyecto eléctrico con diagrama unifilar',norm:'NOM-001-SEDE',normShort:'SEDE',status:'done',semaphore:'green',reporter:'pm',photos:[null,null],note:'Entregado 03 Jul 2026'},
+        {id:105,desc:'Licencia municipal obtenida y vigente',norm:'H. Ayuntamiento Torreón',normShort:'Mun.',status:'active',semaphore:'yellow',reporter:'pm',photos:[null,null],note:'En trámite — se espera antes del 28 Jul'},
       ]},
       {phase:'Fase 2 — Construcción',open:false,items:[
         {id:201,desc:"Concreto fc=200 kg/cm² — cilindros de prueba",norm:'NMX-C-414',normShort:'NMX-C',status:'pending',semaphore:'gray',reporter:null,photos:[null,null],note:'',riskId:null},
@@ -1424,8 +1606,14 @@ function app(){
     ],
 
     comms:[
+      {id:6,from:'JAM',date:'17 Jul 2026 · 10:00',type:'decision',
+       text:'OC-03 Aprobada — Cambio de Diseño Estructural. Con los planos definitivos del proyecto estructural, se ajustaron los volúmenes reales de cimentación, losa y castillos. Impacto: -$21,868.12 al contrato. Presupuesto vigente: $272,215.07. Inicio de Construcción: 28 Jul 2026.',read:true},
+      {id:5,from:'JAM',date:'06 Jul 2026 · 09:00',type:'decision',
+       text:'OC-02 Aprobada — Calidades en Acabados. Se ajustaron especificaciones de piso cerámico 60×120 Interceramic, pintura vinílica Vinimex 700 en muros y cielos, e impermeabilización Impercrest. Impacto: -$20,862.17 al contrato.',read:true},
+      {id:4,from:'JAM',date:'09 Jun 2026 · 11:00',type:'decision',
+       text:'OC-01 Aprobada — Reducción de Mobiliario. Por solicitud de la clienta, se elimina del alcance el closet modular nogal claro y mueble fijo TV. Impacto: -$48,258.44 al contrato.',read:true},
       {id:3,from:'JAM',date:'23 jun 2026 · 08:13 a.m.',type:'decision',
-       text:'La clienta ha solicitado iniciar las obras hasta el día 27 de julio de 2026.',read:true},
+       text:'La clienta ha solicitado iniciar las obras hasta el día 28 de julio de 2026.',read:true},
       {id:1,from:'JAM',date:'18 Jun 2026 · 14:30',type:'update',
        text:'Proyecto iniciado formalmente. Contrato firmado, Pago 1 recibido ($24,222.37). Comenzamos levantamiento arquitectónico. Portales activos.',read:true},
       {id:2,from:'JAM',date:'19 Jun 2026 · 09:15',type:'update',
